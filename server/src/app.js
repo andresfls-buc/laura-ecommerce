@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
-import sequelize from "./config/sequelize.js"
+import sequelize from "./config/sequelize.js";
+import "./models/user.js";
 
 dotenv.config();
 
@@ -24,6 +25,10 @@ const startServer = async() => {
     try {
         await sequelize.authenticate();
         console.log("Db connected succesfully");
+
+        await sequelize.sync();
+        console.log("Models synchronized");
+        
 
         app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
