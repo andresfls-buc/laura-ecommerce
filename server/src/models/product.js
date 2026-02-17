@@ -17,10 +17,7 @@ Product.init(
     description: {
       type: DataTypes.TEXT,
     },
-    price: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
+    
   },
   {
     sequelize,

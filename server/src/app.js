@@ -3,11 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import sequelize from "./config/sequelize.js";
-import { DataTypes } from "sequelize";
 
-import "./models/user.js";
-import "./models/product.js";
-import "./models/products_variants.js";
+// Importar modelos para que Sequelize los reconozca
+import "./models/index.js"; 
+
 
 
 console.log("registered models:", Object.keys(sequelize.models));
@@ -35,7 +34,7 @@ const startServer = async() => {
         await sequelize.authenticate();
         console.log("Db connected succesfully");
 
-        await sequelize.sync();
+        await sequelize.sync({ force: true});
         console.log("Models synchronized");
         
 
