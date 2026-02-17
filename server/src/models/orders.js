@@ -97,6 +97,7 @@ Order.init(
         "paid", 
         "refunded"
     ),
+    defaultValue: "unpaid",
     },
 
   },
