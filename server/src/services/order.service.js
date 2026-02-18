@@ -16,6 +16,7 @@ class OrderService {
       }
 
       let subtotal = 0;
+      let totalUnits = 0;
       const variantsMap = {};
 
       // 2️⃣ Validate items & calculate subtotal
@@ -40,8 +41,11 @@ class OrderService {
             `Not enough stock for variant ${variant.id}`
           );
         }
-
+        // Calculate subtotal
         subtotal += Number(variant.price) * item.quantity;
+        
+        // update total units
+        totalUnits += item.quantity; 
 
         variantsMap[item.productVariantId] = variant;
       }
@@ -54,6 +58,7 @@ class OrderService {
       const order = await Order.create(
         {
           userId,
+          totalUnits,
           subtotal,
           shippingCost,
           totalAmount,

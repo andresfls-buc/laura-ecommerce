@@ -7,44 +7,54 @@ import sequelize from "./config/sequelize.js";
 // Importar modelos para que Sequelize los reconozca
 import "./models/index.js"; 
 
+//Import routes
+import productRouter from "./routes/product.routes.js";
+import variantRouter from "./routes/variant.routes.js";
 
-
-console.log("registered models:", Object.keys(sequelize.models));
+import globalErrorHandler from "./middlewares/globalErrorHandler.js";
 
 dotenv.config();
 
 const app = express();
 
+console.log("registered models:", Object.keys(sequelize.models));
 
+// parse JSON bodies
+app.use(express.json());
 
 // Middlewares básicos
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+
+// Routes
+app.use("/api/products", productRouter);
+app.use("/api/variants", variantRouter); // Agregar ruta para variantes de productos
 
 // Ruta de prueba
 app.get("/", (req, res) => {
   res.json({ message: "API Laura Ecommerce running" });
 });
 
+// ✅ Global error handler middleware
+app.use(globalErrorHandler);
+
 const PORT = process.env.PORT || 3000;
 
-const startServer = async() => {
-    try {
-        await sequelize.authenticate();
-        console.log("Db connected succesfully");
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("Db connected successfully");
 
-        await sequelize.sync({ force: true});
-        console.log("Models synchronized");
-        
+    // sync models, en producción se recomienda usar migraciones en lugar de sync()
+    await sequelize.sync();
+    console.log("Models synchronized");
 
-        app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-    } catch(error){
-        console.error("Unable to connect to db:", error);
-    }
-}
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Unable to connect to db:", error);
+  }
+};
+
 startServer();
-
-

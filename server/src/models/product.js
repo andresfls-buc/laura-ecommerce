@@ -17,6 +17,11 @@ Product.init(
     description: {
       type: DataTypes.TEXT,
     },
+
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
     
   },
   {
