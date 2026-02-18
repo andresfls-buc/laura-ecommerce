@@ -46,6 +46,12 @@ Order.init(
       allowNull: false,
     },
 
+    totalUnits: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+
    
 
     subtotal: {
