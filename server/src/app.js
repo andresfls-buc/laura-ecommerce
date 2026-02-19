@@ -8,8 +8,7 @@ import sequelize from "./config/sequelize.js";
 import "./models/index.js"; 
 
 //Import routes
-import productRouter from "./routes/product.routes.js";
-import variantRouter from "./routes/variant.routes.js";
+import routes from "./routes/index.js";
 
 import globalErrorHandler from "./middlewares/globalErrorHandler.js";
 
@@ -27,8 +26,7 @@ app.use(helmet());
 app.use(cors());
 
 // Routes
-app.use("/api/products", productRouter);
-app.use("/api/variants", variantRouter); // Agregar ruta para variantes de productos
+app.use("/api", routes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {

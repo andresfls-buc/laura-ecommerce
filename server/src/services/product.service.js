@@ -64,60 +64,56 @@ class ProductService {
 
   // Update product + variants
   static async updateProduct(id, data) {
-  const transaction = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
-  try {
-    const product = await Product.findByPk(id, { transaction });
-    if (!product) throw Boom.notFound("Product not found");
+    try {
+      const product = await Product.findByPk(id, { transaction });
+      if (!product) throw Boom.notFound("Product not found");
 
-    await product.update(
-      {
-        name: data.name ?? product.name,
-        description: data.description ?? product.description,
-        image: data.image ?? product.image,
-      },
-      { transaction }
-    );
+      await product.update(
+        {
+          name: data.name ?? product.name,
+          description: data.description ?? product.description,
+          image: data.image ?? product.image,
+        },
+        { transaction }
+      );
 
-    if (data.variants && Array.isArray(data.variants)) {
-      for (const variantData of data.variants) {
+      if (data.variants && Array.isArray(data.variants)) {
+        for (const variantData of data.variants) {
+          const existingVariant = await ProductVariant.findOne({
+            where: { id: variantData.id, productId: product.id },
+            transaction
+          });
 
-        const existingVariant = await ProductVariant.findOne({
-          where: { id: variantData.id, productId: product.id },
-          transaction
-        });
+          if (!existingVariant) {
+            throw Boom.notFound(`Variant with id ${variantData.id} not found`);
+          }
 
-        if (!existingVariant) {
-          throw Boom.notFound(`Variant with id ${variantData.id} not found`);
+          await existingVariant.update(
+            {
+              size: variantData.size ?? existingVariant.size,
+              color: variantData.color ?? existingVariant.color,
+              price: variantData.price ?? existingVariant.price,
+              stock: variantData.stock ?? existingVariant.stock,
+            },
+            { transaction }
+          );
         }
-
-        await existingVariant.update(
-          {
-            size: variantData.size ?? existingVariant.size,
-            color: variantData.color ?? existingVariant.color,
-            price: variantData.price ?? existingVariant.price,
-            stock: variantData.stock ?? existingVariant.stock,
-          },
-          { transaction }
-        );
       }
+
+      await transaction.commit();
+
+      return await Product.findByPk(product.id, {
+        include: { model: ProductVariant, as: "variants" }
+      });
+
+    } catch (error) {
+      await transaction.rollback();
+      if (error.isBoom) throw error;
+      throw Boom.badImplementation("Failed to update product");
     }
-
-    await transaction.commit();
-
-    return await Product.findByPk(product.id, {
-      include: { model: ProductVariant, as: "variants" }
-    });
-
-  } catch (error) {
-    await transaction.rollback();
-
-    if (error.isBoom) throw error;
-
-    throw Boom.badImplementation("Failed to update product");
   }
-}
-
 
   // Delete product
   static async deleteProduct(id) {
@@ -141,6 +137,18 @@ class ProductService {
       include: { model: ProductVariant, as: "variants" },
       order: [["createdAt", "DESC"]],
     });
+  }
+
+  // ✅ Get variants of a product with optional filters
+  static async getProductVariants(productId, filters = {}) {
+    const { size, color } = filters;
+
+    const whereClause = { productId };
+    if (size) whereClause.size = size;
+    if (color) whereClause.color = color;
+
+    const variants = await ProductVariant.findAll({ where: whereClause });
+    return variants;
   }
 }
 
