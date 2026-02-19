@@ -43,9 +43,6 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log("Db connected successfully");
 
-    // sync models, en producción se recomienda usar migraciones en lugar de sync()
-    await sequelize.sync();
-    console.log("Models synchronized");
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
