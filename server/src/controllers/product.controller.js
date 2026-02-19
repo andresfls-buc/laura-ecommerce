@@ -51,6 +51,18 @@ class ProductController {
       next(error);
     }
   }
+
+  // ✅ Get variants of a product with optional filters (size, color)
+  static async getVariants(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { size, color } = req.query; // optional filters
+      const variants = await ProductService.getProductVariants(id, { size, color });
+      return res.status(200).json(variants);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default ProductController;
