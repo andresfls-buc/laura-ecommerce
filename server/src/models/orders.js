@@ -92,7 +92,12 @@ Order.init(
       allowNull: false,
     },
 
-    transactionId: {
+    reference: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    wompiTransactionId: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -101,7 +106,9 @@ Order.init(
       type: DataTypes.ENUM(
         "unpaid", 
         "paid", 
-        "refunded"
+        "refunded",
+        "failed",
+        "pending"
     ),
     defaultValue: "unpaid",
     },
