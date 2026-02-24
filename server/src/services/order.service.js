@@ -3,6 +3,7 @@ import Boom from "@hapi/boom";
 import { User, Order, Order_items, ProductVariant } from "../models/index.js";
 import { SHIPPING_COST } from "../config/constants.js";
 
+
 class OrderService {
   static async createOrder(userId, orderData) {
     const transaction = await sequelize.transaction();
@@ -59,6 +60,9 @@ class OrderService {
 
       const shippingCost = SHIPPING_COST;
       const totalAmount = subtotal + shippingCost;
+      // Generate unique reference 
+      const reference = `ORDER-${Math.floor(Math.random() * 1000000)}`;
+// ejemplo: ORDER-123456
 
       const order = await Order.create(
         {
@@ -74,11 +78,14 @@ class OrderService {
           subtotal,
           shippingCost,
           totalAmount,
+          reference,
           status: "pending",
           paymentStatus: "unpaid",
         },
         { transaction }
       );
+     
+      
 
       for (const item of items) {
         const variant = variantsMap[item.productVariantId];
@@ -97,22 +104,32 @@ class OrderService {
         await variant.save({ transaction });
       }
 
-      await transaction.commit();
+    await transaction.commit();
 
-      return await Order.findByPk(order.id, {
-        include: [
-          {
-            model: Order_items,
-            as: "items",   // ✅ CORRECT ALIAS
-            include: [
-              {
-                model: ProductVariant,
-                as: "productVariant",
-              },
-            ],
-          },
-        ],
-      });
+const createdOrder = await Order.findByPk(order.id, {
+  include: [
+    {
+      model: Order_items,
+      as: "items",
+      include: [
+        {
+          model: ProductVariant,
+          as: "productVariant",
+        },
+      ],
+    },
+  ],
+});
+
+return {
+  order: createdOrder,
+  checkout: {
+    reference: createdOrder.reference,
+    amountInCents: Math.round(createdOrder.totalAmount * 100),
+    currency: "COP",
+    publicKey: process.env.WOMPI_PUBLIC_KEY,
+  },
+};
 
     } catch (error) {
       await transaction.rollback();

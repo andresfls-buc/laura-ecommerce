@@ -8,7 +8,7 @@ export function useProducts() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await api.get("/products"); // tu endpoint en backend
+        const res = await api.get("http://localhost:3000/api/products"); // tu endpoint en backend
         setProducts(res.data);
       } catch (error) {
         console.error("Error fetching products:", error);
