@@ -1,14 +1,21 @@
-import Home from "./Home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import TestPayment from "./components/TestPayment";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Catalogue from "./pages/Catalogue";
 
 function App() {
   return (
-    <>
+    <Router>
       <Navbar />
-      <Home />
-      <TestPayment orderId={4} /> {/* <--- Aquí agregamos el componente de prueba */}
-    </>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/catalogue" element={<Catalogue />} />
+      </Routes>
+
+      <Footer />
+    </Router>
   );
 }
 

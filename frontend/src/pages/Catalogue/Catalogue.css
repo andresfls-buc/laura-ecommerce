@@ -1,0 +1,16 @@
+.catalogue-container {
+  padding: 3rem 2rem;
+  min-height: 80vh;
+}
+
+.catalogue-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}

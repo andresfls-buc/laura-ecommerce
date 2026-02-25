@@ -1,6 +1,6 @@
 // src/Home.jsx
-import React from "react";
-import { useProducts } from "./hooks/useProducts"; // el hook que creamos
+import ProductCard from "../../components/ProductCard"; // el componente que creamos
+import { useProducts } from "../../hooks/useProducts"; // el hook que creamos
 import "./Home.css"; // CSS que vamos a crear abajo
 
 const Home = () => {
@@ -18,23 +18,15 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Sección de productos */}
+     {/* Sección de productos */}
       <section className="products-section">
         <h2 className="section-title">Productos destacados</h2>
         {loading ? (
           <p>Cargando productos...</p>
         ) : (
           <div className="products-grid">
-            {products.map((p) => (
-              <div key={p.id} className="product-card">
-                <img
-                  src={p.image || "/default-product.png"}
-                  alt={p.name}
-                  className="product-image"
-                />
-                <h3 className="product-name">{p.name}</h3>
-                <p className="product-price">${p.price}</p>
-              </div>
+            {products.slice(0, 4).map((p) => (
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         )}
