@@ -1,20 +1,22 @@
+import logo from "../../assets/logo.png";
 import "./Footer.css";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-container">
 
-        <div className="footer-section">
-          <h3>GoGo Uniformes</h3>
+        <div className="footer-section footer-brand">
+          <img src={logo} alt="Logo"  />
           <p>Viste con estilo todos los días.</p>
         </div>
 
         <div className="footer-section">
           <h4>Enlaces</h4>
           <ul>
-            <li>Inicio</li>
-            <li>Catálogo</li>
+            <li><Link to="/">Inicio</Link></li>
+            <li><Link to="/catalogue">Catálogo</Link></li>
           </ul>
         </div>
 

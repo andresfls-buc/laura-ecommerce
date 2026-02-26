@@ -5,6 +5,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  position: relative;
 }
 
 .navbar-container {
@@ -13,13 +14,15 @@
   align-items: center;
   max-width: 1200px;
   margin: auto;
+  
 }
 
-.navbar-logo {
-  font-size: 22px;
-  font-weight: bold;
-  color: #e91e63;
-  cursor: pointer;
+.navbar-logo img {
+  height: 55px;        /* controls logo size */
+  width: auto;         /* keeps proportions */
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
 }
 
 /* Links */
@@ -27,6 +30,8 @@
   list-style: none;
   display: flex;
   gap: 30px;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar-links li {
@@ -34,21 +39,82 @@
   transition: 0.3s;
 }
 
-.navbar-links li:hover {
-  color: #e91e63;
+.navbar-links a {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  font-size: 16px;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
+
+.navbar-links a:hover {
+  color: #fff;
+  background-color: #e91e63;
+}
+
+.navbar-links a:visited {
+  color: white;
+}
+
+
 
 /* Cart */
 .navbar-cart {
   font-size: 20px;
   cursor: pointer;
+  transition: 0.3s;
+}
+.navbar-cart:hover {
+  color: #e91e63;
 }
 
-/* Toggle Button */
 .navbar-toggle {
   display: none;
-  font-size: 24px;
+  width: 28px;
+  height: 22px;
+  position: relative;
   cursor: pointer;
+}
+
+.navbar-toggle span {
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Top line */
+.navbar-toggle span:nth-child(1) {
+  top: 0;
+}
+
+/* Middle line */
+.navbar-toggle span:nth-child(2) {
+  top: 9px;
+}
+
+/* Bottom line */
+.navbar-toggle span:nth-child(3) {
+  bottom: 0;
+}
+
+/* Animate to X */
+.navbar-toggle.open span:nth-child(1) {
+  transform: rotate(45deg);
+  top: 9px;
+}
+
+.navbar-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggle.open span:nth-child(3) {
+  transform: rotate(-45deg);
+  bottom: 10px;
 }
 
 /* 📱 Mobile Styles */
@@ -56,7 +122,7 @@
 
   .navbar-links {
     position: absolute;
-    top: 60px;
+    top: 100%;
     left: 0;
     width: 100%;
     background-color: #111;
@@ -69,6 +135,11 @@
 
   .navbar-links.active {
     display: flex;
+  }
+
+  .navbar-links a{
+    width: 100%;
+    text-align: center;
   }
 
   .navbar-toggle {
