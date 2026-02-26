@@ -16,18 +16,27 @@
   margin-bottom: 1rem;
 }
 
+/* Footer Links */
 .footer-section ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.footer-section li {
-  margin-bottom: 0.5rem;
-  cursor: pointer;
+.footer-section ul li {
+  margin-bottom: 8px;
 }
 
-.footer-section li:hover {
-  text-decoration: underline;
+.footer-section ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 15px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+  color: #e91e63;
+  transform: translateX(5px)
 }
 
 .footer-bottom {
@@ -35,4 +44,13 @@
   margin-top: 2rem;
   font-size: 0.9rem;
   opacity: 0.7;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+.footer-brand img {
+  height: 50px;        /* controls logo size */
+  width: auto;         /* keeps proportions */
+  margin-bottom: 10px;
+  filter: brightness(0) invert(1);
 }
