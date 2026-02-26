@@ -32,15 +32,24 @@ class ProductController {
     }
   }
 
-  // Get product by ID (with variants)
-  static async getById(req, res, next) {
-    try {
-      const product = await ProductService.getProductById(req.params.id);
-      return res.status(200).json(product);
-    } catch (error) {
-      next(error);
+ // Get product by ID (with variants)
+
+static async getById(req, res, next) {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ message: "ID inválido" });
+
+    const product = await ProductService.getProductById(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
     }
+
+    return res.status(200).json(product);
+  } catch (error) {
+    next(error); // global error handler
   }
+}
 
   // Get all products (with variants)
   static async getAll(req, res, next) {

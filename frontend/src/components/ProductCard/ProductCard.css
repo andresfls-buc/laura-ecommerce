@@ -1,23 +1,68 @@
+.product-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .product-card {
-  border: 1px solid #eee;
-  border-radius: 10px;
-  padding: 1rem;
-  background: white;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-wrapper {
+  position: relative;
+  overflow: hidden;
 }
 
 .product-image {
   width: 100%;
-  height: 200px;
   object-fit: cover;
-  margin-bottom: 1rem;
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.03);
 }
 
 .product-name {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
+  margin-top: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
-.product-price {
-  font-weight: bold;
+.price-container {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.current-price {
+  color: #c40000;
+  font-weight: 600;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #2e4d2e;
+}
+
+.badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.offer {
+  background-color: #c40000;
+  color: white;
+}
+
+.exhausted {
+  border: 1px solid #2e4d2e;
+  color: #2e4d2e;
+  background: white;
 }

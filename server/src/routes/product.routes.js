@@ -42,7 +42,7 @@ router.delete(
   ProductController.delete
 );
 
-// ✅ NEW ROUTE: Get variants for a specific product, optional filters: size, color
+// ✅ Get variants for a specific product, optional filters: size, color
 router.get(
   "/:id/variants",
   validate(idParamSchema, "params"),
