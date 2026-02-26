@@ -125,12 +125,17 @@ class ProductService {
   }
 
   // Get product by ID (with variants)
-  static async getProductById(id) {
-    const product = await Product.findByPk(id, { include: { model: ProductVariant, as: "variants" } });
-    if (!product) throw Boom.notFound("Product not found");
-    return product;
-  }
+// product.service.js
+static async getProductById(id) {
+  const numericId = Number(id); // convert string to number
+  if (isNaN(numericId)) return null;
 
+  const product = await Product.findByPk(numericId, {
+    include: [{ model: ProductVariant, as: "variants" }], // include variants
+  });
+
+  return product; // null if not found
+}
   // Get all products (with variants)
   static async getAllProducts() {
     return await Product.findAll({
