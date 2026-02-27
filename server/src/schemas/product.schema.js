@@ -1,5 +1,8 @@
 import Joi from 'joi';
 
+// ----------------------------
+// Product Schemas
+// ----------------------------
 export const createProductSchema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().allow(''),
@@ -28,3 +31,34 @@ export const updateProductSchema = Joi.object({
     }).min(2)
   ) 
 }).min(1); // require at least one field to update
+
+// ----------------------------
+// Variant Image Schemas
+// ----------------------------
+
+// For adding images to variants
+export const createVariantImageSchema = Joi.object({
+  imageUrl: Joi.string().uri().required(),
+  publicId: Joi.string().required()
+});
+
+// For updating variant images
+export const updateVariantImageSchema = Joi.object({
+  imageUrl: Joi.string().uri(),
+  publicId: Joi.string(),
+  order: Joi.number().integer().min(0)
+}).min(1);
+
+// ----------------------------
+// Param Schemas
+// ----------------------------
+
+export const productVariantParamsSchema = Joi.object({
+  productId: Joi.number().integer().required(),
+  variantId: Joi.number().integer().required()
+});
+
+// For validating image ID in params
+export const imageIdParamSchema = Joi.object({
+  imageId: Joi.number().integer().required()
+});

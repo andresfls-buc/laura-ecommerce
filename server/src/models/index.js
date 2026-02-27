@@ -5,6 +5,7 @@ import Product from "./product.js";
 import ProductVariant from "./products_variants.js";
 import Order from "./orders.js";
 import Order_items from "./orders_items.js";
+import ProductImage from "./productImage.model.js";
 
 // Establecer relaciones entre modelos
 // Product can have many variants 1 -> N
@@ -45,6 +46,16 @@ Order_items.belongsTo(ProductVariant, {
     as: "productVariant",
 });
 
+// ProductVariant can have many images 1 -> N
+ProductVariant.hasMany(ProductImage, {
+  foreignKey: "productVariantId",
+  as: "images",
+});
+// Each image belongs to one variant
+ProductImage.belongsTo(ProductVariant, {
+  foreignKey: "productVariantId",
+});
+
 
 export{
     sequelize,
@@ -53,4 +64,5 @@ export{
     ProductVariant,
     Order,
     Order_items,
+    ProductImage,
 }
