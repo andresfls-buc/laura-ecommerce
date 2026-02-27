@@ -1,7 +1,14 @@
 import express from "express";
 import ProductController from "../controllers/product.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import { createProductSchema, updateProductSchema } from "../schemas/product.schema.js";
+import {
+  createProductSchema,
+  updateProductSchema,
+  createVariantImageSchema,
+  updateVariantImageSchema,
+  imageIdParamSchema,
+  productVariantParamsSchema,
+} from "../schemas/product.schema.js";
 import { idParamSchema } from "../schemas/common.schema.js";
 import { protectAdmin } from "../middlewares/auth.middleware.js";
 
@@ -11,7 +18,7 @@ const router = express.Router();
 router.post(
   "/",
   protectAdmin,
-  validate(createProductSchema),
+  validate(createProductSchema, "body"),
   ProductController.create
 );
 
@@ -30,7 +37,7 @@ router.put(
   "/:id",
   protectAdmin,
   validate(idParamSchema, "params"),
-  validate(updateProductSchema),
+  validate(updateProductSchema, "body"),
   ProductController.update
 );
 
@@ -42,11 +49,29 @@ router.delete(
   ProductController.delete
 );
 
-// ✅ Get variants for a specific product, optional filters: size, color
+// Get variants for a specific product
 router.get(
   "/:id/variants",
   validate(idParamSchema, "params"),
   ProductController.getVariants
+);
+
+// Add image to a specific variant
+router.post(
+  "/:productId/variants/:variantId/images",
+  protectAdmin,
+  validate(productVariantParamsSchema, "params"), // ✅ validate both at once
+  validate(createVariantImageSchema, "body"),
+  ProductController.addVariantImage
+);
+
+// Update a specific variant image
+router.patch(
+  "/variants/images/:imageId",
+  protectAdmin,
+  validate(imageIdParamSchema, "params"),
+  validate(updateVariantImageSchema, "body"),
+  ProductController.updateVariantImage
 );
 
 export default router;

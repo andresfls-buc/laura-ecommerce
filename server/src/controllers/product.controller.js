@@ -72,6 +72,40 @@ static async getById(req, res, next) {
       next(error);
     }
   }
+  //  Add image to a product variant
+  static async addVariantImage(req, res, next) {
+  try {
+    const { productId, variantId } = req.params;
+
+    const image = await ProductService.addImageToVariant(
+      variantId,
+      req.body,
+      productId
+    );
+
+    res.status(201).json(image);
+  } catch (error) {
+    next(error);
+  }
+}
+
+//  Update a specific variant image
+static async updateVariantImage(req, res, next) {
+  try {
+    const { imageId } = req.params;
+
+    const updatedImage = await ProductService.updateVariantImage(
+      imageId,
+      req.body
+    );
+
+    res.status(200).json(updatedImage);
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 }
 
 export default ProductController;
