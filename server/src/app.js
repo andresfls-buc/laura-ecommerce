@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import sequelize from "./config/sequelize.js";
+import path from "path";
 
 // Importar modelos para que Sequelize los reconozca
 import "./models/index.js"; 
@@ -24,6 +25,9 @@ app.use(express.json());
 // Middlewares básicos
 app.use(helmet());
 app.use(cors());
+
+// Server uploaded images
+app.use("/uploads", express.static(path.resolve("uploads")));
 
 // Routes
 app.use("/api", routes);
