@@ -5,7 +5,6 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  position: relative;
 }
 
 .navbar-container {
@@ -14,12 +13,11 @@
   align-items: center;
   max-width: 1200px;
   margin: auto;
-  
 }
 
 .navbar-logo img {
-  height: 55px;        /* controls logo size */
-  width: auto;         /* keeps proportions */
+  height: 55px;
+  width: auto;
   object-fit: contain;
   display: block;
   filter: brightness(0) invert(1);
@@ -34,19 +32,14 @@
   padding: 0;
 }
 
-.navbar-links li {
-  cursor: pointer;
-  transition: 0.3s;
-}
-
 .navbar-links a {
   display: block;
   padding: 8px 12px;
   text-decoration: none;
-  color: white;
+  color: white; /* Force white color */
   font-weight: 500;
   font-size: 16px;
-  transition: color 0.3s ease, background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .navbar-links a:hover {
@@ -54,22 +47,53 @@
   background-color: #e91e63;
 }
 
-.navbar-links a:visited {
+/* Prevent visited links from turning purple */
+.navbar-links a:visited, 
+.cart-icon-wrapper:visited {
   color: white;
 }
 
-
-
-/* Cart */
+/* 🛒 Cart Section Specifics */
 .navbar-cart {
-  font-size: 20px;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.cart-icon-wrapper {
+  position: relative; /* Context for the badge */
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white; /* ✅ Fix: Ensures the icon isn't blue/purple */
+  font-size: 24px;
   transition: 0.3s;
 }
-.navbar-cart:hover {
-  color: #e91e63;
+
+.cart-icon-wrapper:hover {
+  color: #e91e63; /* Turns pink on hover like your links */
 }
 
+/* 🔴 The Badge */
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: #e91e63; /* Matches your pink theme */
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #111; /* Matches navbar background to look "cut out" */
+  padding: 2px;
+}
+
+/* Hamburger Menu Toggle */
 .navbar-toggle {
   display: none;
   width: 28px;
@@ -87,39 +111,16 @@
   transition: all 0.3s ease;
 }
 
-/* Top line */
-.navbar-toggle span:nth-child(1) {
-  top: 0;
-}
+.navbar-toggle span:nth-child(1) { top: 0; }
+.navbar-toggle span:nth-child(2) { top: 9px; }
+.navbar-toggle span:nth-child(3) { bottom: 0; }
 
-/* Middle line */
-.navbar-toggle span:nth-child(2) {
-  top: 9px;
-}
-
-/* Bottom line */
-.navbar-toggle span:nth-child(3) {
-  bottom: 0;
-}
-
-/* Animate to X */
-.navbar-toggle.open span:nth-child(1) {
-  transform: rotate(45deg);
-  top: 9px;
-}
-
-.navbar-toggle.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.navbar-toggle.open span:nth-child(3) {
-  transform: rotate(-45deg);
-  bottom: 10px;
-}
+.navbar-toggle.open span:nth-child(1) { transform: rotate(45deg); top: 9px; }
+.navbar-toggle.open span:nth-child(2) { opacity: 0; }
+.navbar-toggle.open span:nth-child(3) { transform: rotate(-45deg); bottom: 10px; }
 
 /* 📱 Mobile Styles */
 @media (max-width: 768px) {
-
   .navbar-links {
     position: absolute;
     top: 100%;
@@ -137,24 +138,11 @@
     display: flex;
   }
 
-  .navbar-links a{
-    width: 100%;
-    text-align: center;
-  }
-
   .navbar-toggle {
     display: block;
   }
+
   .navbar-cart {
-  font-size: 22px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: 0.3s;
-}
-
-.navbar-cart:hover {
-  color: #e91e63;
-}
-
+    margin-right: 15px; /* Give space from the toggle button */
+  }
 }

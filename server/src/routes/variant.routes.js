@@ -62,4 +62,33 @@ router.post(
   }
 );
 
+// Delete image (Admin only)
+router.delete(
+  "/:variantId/images/:imageId",
+  protectAdmin,
+  async (req, res) => {
+    try {
+      // 🔐 Role check
+      if (!req.user || req.user.role !== "admin") {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { imageId } = req.params;
+
+      const image = await ProductImage.findByPk(imageId);
+
+      if (!image) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      await image.destroy();
+
+      res.status(200).json({ message: "Image deleted successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Deletion failed" });
+    }
+  }
+);
+
 export default router;

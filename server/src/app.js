@@ -23,8 +23,15 @@ console.log("registered models:", Object.keys(sequelize.models));
 app.use(express.json());
 
 // Middlewares básicos
-app.use(helmet());
-app.use(cors());
+app.use(helmet(
+  {
+    crossOriginResourcePolicy: false, // Permitir cargar imágenes desde el mismo dominio
+  }
+));
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
 
 // Server uploaded images
 app.use("/uploads", express.static(path.resolve("uploads")));
