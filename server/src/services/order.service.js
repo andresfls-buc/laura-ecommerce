@@ -3,7 +3,6 @@ import Boom from "@hapi/boom";
 import { User, Order, Order_items, ProductVariant } from "../models/index.js";
 import { SHIPPING_COST } from "../config/constants.js";
 
-
 class OrderService {
   static async createOrder(userId, orderData) {
     const transaction = await sequelize.transaction();
@@ -24,7 +23,6 @@ class OrderService {
         throw Boom.badRequest("Order must contain at least one item");
       }
 
-      // Validate user (if provided)
       if (userId) {
         const user = await User.findByPk(userId, { transaction });
         if (!user) throw Boom.notFound("User not found");
@@ -35,154 +33,85 @@ class OrderService {
       const variantsMap = {};
 
       for (const item of items) {
-        const variant = await ProductVariant.findByPk(
-          item.productVariantId,
-          { transaction }
-        );
-
-        if (!variant) {
-          throw Boom.notFound(
-            `Product variant ${item.productVariantId} not found`
-          );
-        }
-
-        if (variant.stock < item.quantity) {
-          throw Boom.conflict(
-            `Not enough stock for variant ${variant.id}`
-          );
-        }
+        const variant = await ProductVariant.findByPk(item.productVariantId, { transaction });
+        if (!variant) throw Boom.notFound(`Product variant ${item.productVariantId} not found`);
+        if (variant.stock < item.quantity) throw Boom.conflict(`Not enough stock for variant ${variant.id}`);
 
         subtotal += Number(variant.price) * item.quantity;
         totalUnits += item.quantity;
-
         variantsMap[item.productVariantId] = variant;
       }
 
-      const shippingCost = SHIPPING_COST;
-      const totalAmount = subtotal + shippingCost;
-      // Generate unique reference 
-      const reference = `ORDER-${Math.floor(Math.random() * 1000000)}`;
-// ejemplo: ORDER-123456
+      const totalAmount = subtotal + SHIPPING_COST;
+      const reference = `ORDER-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-      const order = await Order.create(
-        {
-          userId: userId || null,
-          customerName,
-          customerEmail,
-          customerPhone: customerPhone || null,
-          shippingAddress,
-          shippingCity,
-          shippingPostalCode,
-          paymentMethod,
-          totalUnits,
-          subtotal,
-          shippingCost,
-          totalAmount,
-          reference,
-          status: "pending",
-          paymentStatus: "unpaid",
-        },
-        { transaction }
-      );
-     
-      
+      const order = await Order.create({
+        userId: userId || null,
+        customerName,
+        customerEmail,
+        customerPhone: customerPhone || null,
+        shippingAddress,
+        shippingCity,
+        shippingPostalCode,
+        paymentMethod,
+        totalUnits,
+        subtotal,
+        shippingCost: SHIPPING_COST,
+        totalAmount,
+        reference,
+        status: "pending",
+        paymentStatus: "unpaid",
+      }, { transaction });
 
       for (const item of items) {
         const variant = variantsMap[item.productVariantId];
-
-        await Order_items.create(
-          {
-            orderId: order.id,
-            productVariantId: variant.id,
-            quantity: item.quantity,
-            priceAtPurchase: variant.price,
-          },
-          { transaction }
-        );
+        await Order_items.create({
+          orderId: order.id,
+          productVariantId: variant.id,
+          quantity: item.quantity,
+          priceAtPurchase: variant.price,
+        }, { transaction });
 
         variant.stock -= item.quantity;
         await variant.save({ transaction });
       }
 
-    await transaction.commit();
+      await transaction.commit();
 
-const createdOrder = await Order.findByPk(order.id, {
-  include: [
-    {
-      model: Order_items,
-      as: "items",
-      include: [
-        {
-          model: ProductVariant,
-          as: "productVariant",
+      // RETURN LOCAL VARIABLES TO GUARANTEE DATA
+      return {
+        order: order,
+        checkout: {
+          reference: reference, 
+          amountInCents: Math.round(totalAmount * 100),
+          currency: "COP",
         },
-      ],
-    },
-  ],
-});
-
-return {
-  order: createdOrder,
-  checkout: {
-    reference: createdOrder.reference,
-    amountInCents: Math.round(createdOrder.totalAmount * 100),
-    currency: "COP",
-    publicKey: process.env.WOMPI_PUBLIC_KEY,
-  },
-};
+      };
 
     } catch (error) {
-      await transaction.rollback();
+      if (transaction) await transaction.rollback();
       throw error;
     }
   }
 
   static async getAllOrders() {
     return await Order.findAll({
-      include: [
-        {
-          model: Order_items,
-          as: "items",   // ✅ CORRECT
-          include: [
-            {
-              model: ProductVariant,
-              as: "productVariant",
-            },
-          ],
-        },
-      ],
+      include: [{ model: Order_items, as: "items", include: [{ model: ProductVariant, as: "productVariant" }] }],
       order: [["createdAt", "DESC"]],
     });
   }
 
   static async getOrderById(orderId) {
     const order = await Order.findByPk(orderId, {
-      include: [
-        {
-          model: Order_items,
-          as: "items",   // ✅ CORRECT
-          include: [
-            {
-              model: ProductVariant,
-              as: "productVariant",
-            },
-          ],
-        },
-      ],
+      include: [{ model: Order_items, as: "items", include: [{ model: ProductVariant, as: "productVariant" }] }],
     });
-
-    if (!order) {
-      throw Boom.notFound("Order not found");
-    }
-
+    if (!order) throw Boom.notFound("Order not found");
     return order;
   }
 
   static async updateOrderStatus(orderId, newStatus) {
     const order = await Order.findByPk(orderId);
-
     if (!order) throw Boom.notFound("Order not found");
-
     const allowedTransitions = {
       pending: ["processing", "cancelled"],
       processing: ["shipped", "cancelled"],
@@ -190,54 +119,29 @@ return {
       delivered: [],
       cancelled: [],
     };
-
     if (!allowedTransitions[order.status].includes(newStatus)) {
-      throw Boom.badRequest(
-        `Cannot change order status from '${order.status}' to '${newStatus}'`
-      );
+      throw Boom.badRequest(`Cannot change order status from '${order.status}' to '${newStatus}'`);
     }
-
     order.status = newStatus;
     await order.save();
-
     return order;
   }
 
   static async cancelOrder(orderId) {
     const transaction = await sequelize.transaction();
-
     try {
-      const order = await Order.findByPk(orderId, {
-        include: [
-          {
-            model: Order_items,
-            as: "items",  // ✅ CORRECT
-          },
-        ],
-        transaction,
-      });
-
+      const order = await Order.findByPk(orderId, { include: [{ model: Order_items, as: "items" }], transaction });
       if (!order) throw Boom.notFound("Order not found");
-      if (order.status === "cancelled")
-        throw Boom.badRequest("Order already cancelled");
-
-      for (const item of order.items) {  // ✅ CORRECT
-        const variant = await ProductVariant.findByPk(
-          item.productVariantId,
-          { transaction }
-        );
-
+      if (order.status === "cancelled") throw Boom.badRequest("Order already cancelled");
+      for (const item of order.items) {
+        const variant = await ProductVariant.findByPk(item.productVariantId, { transaction });
         variant.stock += item.quantity;
         await variant.save({ transaction });
       }
-
       order.status = "cancelled";
       await order.save({ transaction });
-
       await transaction.commit();
-
       return order;
-
     } catch (error) {
       await transaction.rollback();
       throw error;
