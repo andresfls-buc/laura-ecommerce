@@ -1,6 +1,7 @@
+import "dotenv/config";
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import helmet from "helmet";
 import sequelize from "./config/sequelize.js";
 import path from "path";
@@ -13,7 +14,7 @@ import routes from "./routes/index.js";
 
 import globalErrorHandler from "./middlewares/globalErrorHandler.js";
 
-dotenv.config();
+
 
 const app = express();
 

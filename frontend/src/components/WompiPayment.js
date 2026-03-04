@@ -1,6 +1,7 @@
-import React from "react";
+// WompiPayment.jsx
 
-const TestPayment = ({ orderId }) => {
+
+const WompiPayment = ({ orderId }) => {
 
   const handlePayment = async () => {
     try {
@@ -27,4 +28,4 @@ const TestPayment = ({ orderId }) => {
   return <button onClick={handlePayment}>Pagar con Wompi</button>;
 };
 
-export default TestPayment;
+export default WompiPayment;
