@@ -6,6 +6,7 @@ import Catalogue from "./pages/Catalogue";
 import ProductDetail from "./pages/ProductDetail";
 import { CartProvider } from "./context/CartContext";
 import Cart from "./pages/Cart";
+import ThankYou from "./pages/ThankYou";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/catalogue" element={<Catalogue />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/thank-you" element={<ThankYou />} />
         </Routes>
 
         <Footer />
