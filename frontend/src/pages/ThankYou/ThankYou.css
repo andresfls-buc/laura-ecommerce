@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --ty-bg: #f7f4ef;
+  --ty-card-bg: #ffffff;
+  --ty-accent: #2c6e49;
+  --ty-accent-light: #d8f0e3;
+  --ty-text-primary: #1a1a1a;
+  --ty-text-muted: #7a7a7a;
+  --ty-border: #e8e3da;
+  --ty-shadow: 0 8px 48px rgba(0,0,0,0.08);
+}
+
+.ty-wrapper {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ty-bg);
+  padding: 2rem;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.ty-wrapper.ty-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ty-card {
+  background: var(--ty-card-bg);
+  border: 1px solid var(--ty-border);
+  border-radius: 20px;
+  box-shadow: var(--ty-shadow);
+  padding: 3rem 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Animated checkmark */
+.ty-icon-circle {
+  width: 80px;
+  height: 80px;
+  background: var(--ty-accent-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.ty-checkmark {
+  width: 52px;
+  height: 52px;
+}
+
+.ty-checkmark-circle {
+  stroke: var(--ty-accent);
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: ty-stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.3s forwards;
+}
+
+.ty-checkmark-check {
+  stroke: var(--ty-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: ty-stroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes ty-stroke {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Typography */
+.ty-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ty-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ty-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--ty-text-muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 340px;
+}
+
+/* Details block */
+.ty-details {
+  width: 100%;
+  background: var(--ty-bg);
+  border: 1px solid var(--ty-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.ty-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+}
+
+.ty-detail-label {
+  color: var(--ty-text-muted);
+  font-weight: 400;
+}
+
+.ty-detail-value {
+  color: var(--ty-text-primary);
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.ty-status-badge {
+  padding: 0.2rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ty-approved {
+  background: var(--ty-accent-light);
+  color: var(--ty-accent);
+}
+
+.ty-other {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Buttons */
+.ty-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.ty-btn-primary {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--ty-accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.ty-btn-primary:hover {
+  background: #235c3b;
+  transform: translateY(-1px);
+}
+
+.ty-btn-secondary {
+  width: 100%;
+  padding: 0.85rem;
+  background: transparent;
+  color: var(--ty-text-muted);
+  border: 1px solid var(--ty-border);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.ty-btn-secondary:hover {
+  color: var(--ty-text-primary);
+  border-color: #bbb;
+}
+
+@media (max-width: 520px) {
+  .ty-card {
+    padding: 2rem 1.5rem;
+  }
+  .ty-title {
+    font-size: 1.65rem;
+  }
+}

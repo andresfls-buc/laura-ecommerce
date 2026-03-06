@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { FiTrash2 } from "react-icons/fi";
 import "./Cart.css";
@@ -6,6 +7,7 @@ import "./Cart.css";
 const Cart = () => {
   const { cartItems, setCartItems } = useCart();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const items = cartItems || [];
 
@@ -108,21 +110,27 @@ const Cart = () => {
       // 3. Esperar a que Wompi esté listo
       await waitForWompi();
 
-      // 4. Inicializar Widget de Wompi
+      // 4. Inicializar Widget de Wompi con redirectUrl apuntando a /thank-you
+      
+
       const handler = new window.WidgetCheckout({
         currency: paymentData.currency || "COP",
         amountInCents: Number(amountToPay),
         reference: paymentData.reference,
         publicKey: paymentData.publicKey,
         "signature:integrity": paymentData.signature,
+        
       });
 
       // 5. Abrir el modal de pago
       handler.open((res) => {
         const transaction = res.transaction;
         if (transaction && transaction.status === "APPROVED") {
-          alert("¡Pago aprobado! 🎉");
           setCartItems([]);
+          // Redirigir a la página de confirmación con los datos de la transacción
+          navigate(
+            `/thank-you?id=${transaction.id}&status=${transaction.status}&reference=${transaction.reference}`
+          );
         } else if (transaction && transaction.status === "DECLINED") {
           alert("El pago fue rechazado.");
         }
