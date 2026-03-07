@@ -2,6 +2,10 @@ import crypto from "crypto";
 import { Order } from "../models/index.js";
 
 export const createPayment = async (req, res) => {
+
+  console.log("WOMPI_PUBLIC_KEY:", process.env.WOMPI_PUBLIC_KEY);
+  console.log("WOMPI_INTEGRITY_SECRET:", process.env.WOMPI_INTEGRITY_SECRET ? "loaded" : "undefined");
+
   try {
     const { orderId } = req.body;
     const order = await Order.findByPk(orderId);
