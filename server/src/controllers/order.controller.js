@@ -2,7 +2,7 @@ import crypto from "crypto";
 import OrderService from "../services/order.service.js";
 
 /**
- * Handles the creation of a new order and prepares 
+ * Handles the creation of a new order and prepares
  * the necessary data for the Wompi payment widget.
  */
 export const createOrder = async (req, res, next) => {
@@ -22,24 +22,27 @@ export const createOrder = async (req, res, next) => {
     const currency = String(checkout.currency || "COP");
     const integritySecret = process.env.WOMPI_INTEGRITY_SECRET;
     const publicKey = process.env.WOMPI_PUBLIC_KEY;
+    const redirectUrl = process.env.WOMPI_REDIRECT_URL;
 
     // 4. Generate the SHA256 Integrity Signature
-    // Strict Order: reference + amountInCents + currency + integritySecret
+    // Strict Order: reference + amountInCents + currency + redirectUrl + integritySecret
+    // ✅ Correct — no redirectUrl in the signature
     const rawSignatureString = `${reference}${amountInCents}${currency}${integritySecret}`;
+    
+    const signature = crypto
+      .createHash("sha256")
+      .update(rawSignatureString)
+      .digest("hex");
 
-const signature = crypto
-  .createHash("sha256")
-  .update(rawSignatureString)
-  .digest("hex");
-  
-console.log("--- Signature Debug ---");
-console.log("1. reference:    ", JSON.stringify(reference));
-console.log("2. amountInCents:", JSON.stringify(amountInCents));
-console.log("3. currency:     ", JSON.stringify(currency));
-console.log("4. secret:       ", JSON.stringify(integritySecret));
-console.log("5. Raw String:   ", JSON.stringify(rawSignatureString));
-console.log("6. Signature:    ", signature);
-console.log("7. Sig length:   ", signature.length);
+    console.log("--- Signature Debug ---");
+    console.log("1. reference:    ", JSON.stringify(reference));
+    console.log("2. amountInCents:", JSON.stringify(amountInCents));
+    console.log("3. currency:     ", JSON.stringify(currency));
+    console.log("4. redirectUrl:  ", JSON.stringify(redirectUrl));
+    console.log("5. secret:       ", JSON.stringify(integritySecret));
+    console.log("6. Raw String:   ", JSON.stringify(rawSignatureString));
+    console.log("7. Signature:    ", signature);
+    console.log("8. Sig length:   ", signature.length);
 
     // 5. Return everything to Frontend
     return res.status(201).json({
@@ -52,8 +55,9 @@ console.log("7. Sig length:   ", signature.length);
           amountInCents: Number(amountInCents),
           currency: currency,
           signature: signature,
-          publicKey: publicKey // FIXED: Using the variable defined above
-        }
+          publicKey: publicKey,
+          redirectUrl: redirectUrl, // ← sent to frontend for widget
+        },
       },
     });
   } catch (error) {
