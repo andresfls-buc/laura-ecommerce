@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { FiTrash2 } from "react-icons/fi";
+import CheckoutModal from "./CheckoutModal";
 import "./Cart.css";
 
 const Cart = () => {
   const { cartItems, setCartItems } = useCart();
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const items = cartItems || [];
@@ -57,24 +59,24 @@ const Cart = () => {
       }, 250);
     });
 
-  // Función principal de Checkout
-  const handleCreateOrder = async () => {
+  // Función principal de Checkout — recibe los datos del formulario
+  const handleCreateOrder = async (customerData) => {
     if (!items.length) return;
 
     try {
       setLoading(true);
 
-      // 1. Crear la orden en el backend
+      // 1. Crear la orden en el backend con los datos reales del cliente
       const response = await fetch("http://localhost:3000/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerName: "Cliente Web",
-          customerEmail: "cliente@test.com",
-          customerPhone: "3000000000",
-          shippingAddress: "Dirección pendiente",
-          shippingCity: "Bogotá",
-          shippingPostalCode: "000000",
+          customerName: customerData.customerName,
+          customerEmail: customerData.customerEmail,
+          customerPhone: customerData.customerPhone,
+          shippingAddress: customerData.shippingAddress,
+          shippingCity: customerData.shippingCity,
+          shippingPostalCode: customerData.shippingPostalCode,
           paymentMethod: "wompi",
           items: items.map((item) => ({
             productVariantId: item.productVariantId,
@@ -99,7 +101,8 @@ const Cart = () => {
         return;
       }
 
-      const amountToPay = paymentData.amountInCents || paymentData.amount_in_cents;
+      const amountToPay =
+        paymentData.amountInCents || paymentData.amount_in_cents;
 
       if (!amountToPay || !paymentData.signature) {
         console.error("Datos incompletos:", paymentData);
@@ -110,24 +113,30 @@ const Cart = () => {
       // 3. Esperar a que Wompi esté listo
       await waitForWompi();
 
-      // 4. Inicializar Widget de Wompi con redirectUrl apuntando a /thank-you
-      
-
-      const handler = new window.WidgetCheckout({
+      // 4. Inicializar Widget de Wompi
+      // redirectUrl is only included in production — Wompi blocks localhost URLs
+      const widgetConfig = {
         currency: paymentData.currency || "COP",
         amountInCents: Number(amountToPay),
         reference: paymentData.reference,
         publicKey: paymentData.publicKey,
         "signature:integrity": paymentData.signature,
-        
-      });
+      };
+
+      if (
+        paymentData.redirectUrl &&
+        !paymentData.redirectUrl.includes("localhost")
+      ) {
+        widgetConfig.redirectUrl = paymentData.redirectUrl;
+      }
+
+      const handler = new window.WidgetCheckout(widgetConfig);
 
       // 5. Abrir el modal de pago
       handler.open((res) => {
         const transaction = res.transaction;
         if (transaction && transaction.status === "APPROVED") {
           setCartItems([]);
-          // Redirigir a la página de confirmación con los datos de la transacción
           navigate(
             `/thank-you?id=${transaction.id}&status=${transaction.status}&reference=${transaction.reference}`
           );
@@ -151,57 +160,90 @@ const Cart = () => {
     );
 
   return (
-    <div className="cart-page">
-      <h1 className="cart-title">Tu Carrito</h1>
-      <div className="cart-container">
-        <div className="cart-items-section">
-          {items.map((item) => (
-            <div key={item.productVariantId} className="cart-card">
-              <img src={item.image} alt={item.name} className="cart-card-img" />
-              <div className="cart-card-info">
-                <h3>{item.name}</h3>
-                <p>
-                  {item.color} / {item.size}
-                </p>
-                <div className="cart-qty-selector">
-                  <button onClick={() => updateQuantity(item.productVariantId, -1)}>-</button>
-                  <span>{item.quantity}</span>
+    <>
+      {/* Checkout Modal — appears before payment */}
+      <CheckoutModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={(customerData) => {
+          setIsModalOpen(false);
+          handleCreateOrder(customerData);
+        }}
+        loading={loading}
+      />
+
+      <div className="cart-page">
+        <h1 className="cart-title">Tu Carrito</h1>
+        <div className="cart-container">
+          <div className="cart-items-section">
+            {items.map((item) => (
+              <div key={item.productVariantId} className="cart-card">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="cart-card-img"
+                />
+                <div className="cart-card-info">
+                  <h3>{item.name}</h3>
+                  <p>
+                    {item.color} / {item.size}
+                  </p>
+                  <div className="cart-qty-selector">
+                    <button
+                      onClick={() =>
+                        updateQuantity(item.productVariantId, -1)
+                      }
+                    >
+                      -
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() =>
+                        updateQuantity(item.productVariantId, 1)
+                      }
+                      disabled={item.quantity >= item.stock}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <div className="cart-card-price">
+                  <p>
+                    $
+                    {(Number(item.price) * item.quantity).toLocaleString(
+                      "es-CO"
+                    )}{" "}
+                    COP
+                  </p>
                   <button
-                    onClick={() => updateQuantity(item.productVariantId, 1)}
-                    disabled={item.quantity >= item.stock}
+                    onClick={() => removeItem(item.productVariantId)}
+                    className="delete-icon-btn"
                   >
-                    +
+                    <FiTrash2 />
                   </button>
                 </div>
               </div>
-              <div className="cart-card-price">
-                <p>${(Number(item.price) * item.quantity).toLocaleString("es-CO")} COP</p>
-                <button
-                  onClick={() => removeItem(item.productVariantId)}
-                  className="delete-icon-btn"
-                >
-                  <FiTrash2 />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="cart-summary">
-          <h3>Resumen</h3>
-          <div className="summary-row">
-            <span>Total</span>
-            <span>${total.toLocaleString("es-CO")}</span>
+            ))}
           </div>
-          <button
-            className="checkout-btn"
-            disabled={loading}
-            onClick={handleCreateOrder}
-          >
-            {loading ? "Procesando..." : "Finalizar Compra"}
-          </button>
+
+          <div className="cart-summary">
+            <h3>Resumen</h3>
+            <div className="summary-row">
+              <span>Total</span>
+              <span>${total.toLocaleString("es-CO")}</span>
+            </div>
+            {/* Opens the checkout modal instead of calling the API directly */}
+            <button
+              className="checkout-btn"
+              disabled={loading}
+              onClick={() => setIsModalOpen(true)}
+            >
+              {loading ? "Procesando..." : "Finalizar Compra"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
