@@ -1,10 +1,17 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import sequelize from "./config/sequelize.js";
-import path from "path";
+
 
 // Importar modelos para que Sequelize los reconozca
 import "./models/index.js"; 
