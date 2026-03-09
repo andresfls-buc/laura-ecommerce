@@ -17,20 +17,36 @@ const ThankYou = () => {
   }, []);
 
   const isApproved = !status || status === "APPROVED";
+  const isPending = status === "PENDING";
 
   return (
     <div className={`ty-wrapper ${visible ? "ty-visible" : ""}`}>
       <div className="ty-card">
         <div className="ty-icon-circle">
           <svg viewBox="0 0 52 52" className="ty-checkmark">
-            <circle cx="26" cy="26" r="25" fill="none" className="ty-checkmark-circle" />
-            <path fill="none" d="M14 27 l8 8 l16-16" className="ty-checkmark-check" />
+            <circle
+              cx="26"
+              cy="26"
+              r="25"
+              fill="none"
+              className="ty-checkmark-circle"
+            />
+            <path
+              fill="none"
+              d="M14 27 l8 8 l16-16"
+              className="ty-checkmark-check"
+            />
           </svg>
         </div>
 
-        <h1 className="ty-title">¡Gracias por tu compra!</h1>
+        <h1 className="ty-title">
+          {isPending ? "¡Pago en proceso!" : "¡Gracias por tu compra!"}
+        </h1>
+
         <p className="ty-subtitle">
-          Tu pago fue procesado exitosamente. En breve recibirás un correo de confirmación.
+          {isPending
+            ? "Tu pago PSE está siendo procesado. Te notificaremos por correo cuando sea confirmado."
+            : "Tu pago fue procesado exitosamente. En breve recibirás un correo de confirmación."}
         </p>
 
         {(transactionId || reference) && (
@@ -50,8 +66,16 @@ const ThankYou = () => {
             {status && (
               <div className="ty-detail-row">
                 <span className="ty-detail-label">Estado</span>
-                <span className={`ty-status-badge ${isApproved ? "ty-approved" : "ty-other"}`}>
-                  {isApproved ? "Aprobado" : status}
+                <span
+                  className={`ty-status-badge ${
+                    isApproved
+                      ? "ty-approved"
+                      : isPending
+                        ? "ty-pending"
+                        : "ty-other"
+                  }`}
+                >
+                  {isApproved ? "Aprobado" : isPending ? "Pendiente" : status}
                 </span>
               </div>
             )}
@@ -59,7 +83,10 @@ const ThankYou = () => {
         )}
 
         <div className="ty-actions">
-          <button className="ty-btn-primary" onClick={() => navigate("/catalogue")}>
+          <button
+            className="ty-btn-primary"
+            onClick={() => navigate("/catalogue")}
+          >
             Seguir comprando
           </button>
           <button className="ty-btn-secondary" onClick={() => navigate("/")}>

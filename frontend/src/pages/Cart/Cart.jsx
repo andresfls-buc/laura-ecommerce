@@ -133,17 +133,24 @@ const Cart = () => {
       const handler = new window.WidgetCheckout(widgetConfig);
 
       // 5. Abrir el modal de pago
-      handler.open((res) => {
+      handler.open(async (res) => {
+        console.log("Wompi callback:", res);
         const transaction = res.transaction;
-        if (transaction && transaction.status === "APPROVED") {
+
+        if (!transaction) return;
+
+        if (
+          transaction.status === "APPROVED" ||
+          transaction.status === "PENDING"
+        ) {
           setCartItems([]);
           navigate(
             `/thank-you?id=${transaction.id}&status=${transaction.status}&reference=${transaction.reference}`
           );
-        } else if (transaction && transaction.status === "DECLINED") {
+        } else if (transaction.status === "DECLINED") {
           alert("El pago fue rechazado.");
         }
-      });
+      }); // ✅ closes handler.open()
     } catch (error) {
       console.error("Error en handleCreateOrder:", error);
       alert("Hubo un error de conexión.");
@@ -190,17 +197,13 @@ const Cart = () => {
                   </p>
                   <div className="cart-qty-selector">
                     <button
-                      onClick={() =>
-                        updateQuantity(item.productVariantId, -1)
-                      }
+                      onClick={() => updateQuantity(item.productVariantId, -1)}
                     >
                       -
                     </button>
                     <span>{item.quantity}</span>
                     <button
-                      onClick={() =>
-                        updateQuantity(item.productVariantId, 1)
-                      }
+                      onClick={() => updateQuantity(item.productVariantId, 1)}
                       disabled={item.quantity >= item.stock}
                     >
                       +
