@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useCart } from "../../context/CartContext"; 
+import { useParams, useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 import "./ProductDetail.css";
 import axios from "axios";
+import { BsCartPlus } from "react-icons/bs";
+import { MdPayment } from "react-icons/md";
+import { FiCheckCircle, FiAlertTriangle, FiXCircle } from "react-icons/fi";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { addToCart } = useCart(); 
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +27,9 @@ const ProductDetail = () => {
         if (fetchedProduct.variants?.length > 0) {
           const firstVariant = fetchedProduct.variants[0];
           setSelectedVariant(firstVariant);
-          setSelectedImage(firstVariant.images?.[0]?.imageUrl || fetchedProduct.image);
+          setSelectedImage(
+            firstVariant.images?.[0]?.imageUrl || fetchedProduct.image
+          );
         } else {
           setSelectedImage(fetchedProduct.image);
         }
@@ -41,34 +47,49 @@ const ProductDetail = () => {
     setSelectedImage(variant.images?.[0]?.imageUrl || product.image);
   };
 
+  const currentStock = selectedVariant ? selectedVariant.stock : product?.stock;
+  const isOutOfStock = currentStock === 0;
+
   const handleAddToCart = () => {
-    // 1. Check if variant is needed and selected
     if (product.variants?.length > 0 && !selectedVariant) {
       alert("Por favor selecciona una variante");
       return;
     }
 
-    // 2. Identify current stock limit
-    const currentStock = selectedVariant ? selectedVariant.stock : product.stock;
-
-    // 3. Attempt to add to cart and capture the result
-    // We update addToCart in Context to return true/false based on stock
     const wasAdded = addToCart({
       id: product.id,
-      productVariantId: selectedVariant?.id || product.id, 
+      productVariantId: selectedVariant?.id || product.id,
       name: product.name,
       price: selectedVariant ? selectedVariant.price : product.price,
       image: selectedImage,
       quantity: 1,
       color: selectedVariant?.color,
       size: selectedVariant?.size,
-      stock: currentStock // ✅ Send stock value to Context
+      stock: currentStock,
     });
 
-    // 4. ✅ Only alert success if the Context actually added it
     if (wasAdded) {
-      alert("Producto agregado al carrito 🛒");
+      alert("Producto agregado al carrito");
     }
+  };
+
+  const handleIrAPagar = () => {
+    if (product.variants?.length > 0 && !selectedVariant) {
+      alert("Por favor selecciona una variante");
+      return;
+    }
+    addToCart({
+      id: product.id,
+      productVariantId: selectedVariant?.id || product.id,
+      name: product.name,
+      price: selectedVariant ? selectedVariant.price : product.price,
+      image: selectedImage,
+      quantity: 1,
+      color: selectedVariant?.color,
+      size: selectedVariant?.size,
+      stock: currentStock,
+    });
+    navigate("/cart");
   };
 
   if (loading) return <p className="loading-text">Cargando...</p>;
@@ -77,7 +98,6 @@ const ProductDetail = () => {
   return (
     <div className="product-detail">
       <div className="product-detail-container">
-        
         {/* LEFT SIDE: Images */}
         <div className="gallery">
           <img
@@ -105,9 +125,13 @@ const ProductDetail = () => {
         <div className="product-info">
           <h1>{product.name}</h1>
           <p className="description">{product.description}</p>
-          
+
           <p className="price">
-            ${Number(selectedVariant?.price || product.price).toLocaleString("es-CO")} COP
+            $
+            {Number(selectedVariant?.price || product.price).toLocaleString(
+              "es-CO"
+            )}{" "}
+            COP
           </p>
 
           {product.variants?.length > 0 && (
@@ -127,11 +151,42 @@ const ProductDetail = () => {
             </div>
           )}
 
-          <button className="add-to-cart-btn" onClick={handleAddToCart}>
-            Add to Cart
-          </button>
-        </div>
+          {/* Stock indicator */}
+          <div className="stock-info">
+            {isOutOfStock ? (
+              <span className="stock-out">
+                <FiXCircle /> Agotado
+              </span>
+            ) : currentStock <= 5 ? (
+              <span className="stock-low">
+                <FiAlertTriangle /> Solo quedan {currentStock} unidades
+              </span>
+            ) : (
+              <span className="stock-available">
+                <FiCheckCircle /> Stock disponible: {currentStock} unidades
+              </span>
+            )}
+          </div>
 
+          {/* Action buttons */}
+          <div className="action-buttons">
+            <button
+              className="add-to-cart-btn"
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+            >
+              <BsCartPlus size={20} /> Agregar al carrito
+            </button>
+
+            <button
+              className="buy-now-btn"
+              onClick={handleIrAPagar}
+              disabled={isOutOfStock}
+            >
+              <MdPayment size={20} /> Ir a pagar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
