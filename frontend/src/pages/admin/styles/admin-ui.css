@@ -1,0 +1,1009 @@
+/* ============================================================
+   ADMIN-ONLY STYLES — Scoped to .admin-shell
+   Single source of truth for all 4 admin pages.
+   NO inline styles needed after this file.
+   ============================================================ */
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────── */
+.admin-shell {
+  --bg: #0f172a;
+  --bg-card: #1e293b;
+  --bg-hover: #273548; /* was missing — used in Products */
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --danger: #f87171;
+  --success: #4ade80;
+  --warning: #fde047;
+
+  /* Layout */
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  box-sizing: border-box;
+  font-family: "DM Sans", "Inter", sans-serif;
+  display: block;
+}
+
+/* ── PAGE HEADER ────────────────────────────────────────────── */
+/* Used in: Dashboard, Orders, Products, Inventory */
+.admin-shell .page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.admin-shell .page-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.admin-shell .page-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── CARDS ──────────────────────────────────────────────────── */
+.admin-shell .card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+/* ── TABLES ─────────────────────────────────────────────────── */
+.admin-shell table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-shell th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  padding: 1rem 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-shell td {
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.admin-shell tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── LOADING / EMPTY STATES ─────────────────────────────────── */
+/* Used in: all pages */
+.admin-shell .loading-state,
+.admin-shell .empty-state {
+  padding: 4rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ── BUTTONS ────────────────────────────────────────────────── */
+.admin-shell .stock-btn,
+.admin-shell .tab-btn {
+  background: #334155;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-shell .stock-btn:hover,
+.admin-shell .tab-btn:hover {
+  background: #475569;
+}
+
+.admin-shell .stock-btn:disabled,
+.admin-shell .tab-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.admin-shell .tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ── FILTER TABS ROW ────────────────────────────────────────── */
+/* Used in: Orders */
+.admin-shell .filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+/* ── BADGES ─────────────────────────────────────────────────── */
+.admin-shell .badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-shell .badge-green {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.admin-shell .badge-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.admin-shell .badge-yellow {
+  background: rgba(234, 179, 8, 0.15);
+  color: var(--warning);
+}
+
+/* ── ORDER ROW HOVER ────────────────────────────────────────── */
+/* Used in: Orders — fixed selector (was on shell, should be on tr) */
+.admin-shell .order-row-hover {
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.admin-shell .order-row-hover:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── DASHBOARD: KPI GRID ────────────────────────────────────── */
+/* Used in: Dashboard — was completely missing */
+.admin-shell.dash-page .kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.admin-shell.dash-page .kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.admin-shell.dash-page .kpi-card:hover {
+  border-color: var(--accent);
+}
+
+.admin-shell.dash-page .kpi-icon {
+  font-size: 1.5rem;
+  color: var(--accent);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.admin-shell.dash-page .kpi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-shell.dash-page .kpi-label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-shell.dash-page .kpi-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── INVENTORY: SUMMARY GRID ────────────────────────────────── */
+/* Used in: Inventory */
+.admin-shell.inv-page .inv-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-shell.inv-page .inv-summary .card {
+  padding: 1.5rem;
+  text-align: center;
+  margin-top: 0;
+}
+
+/* ── PRODUCTS: STOCK CONTROL ────────────────────────────────── */
+/* Used in: Products variants modal */
+.admin-shell .stock-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-shell .stock-control .stock-btn {
+  padding: 4px 12px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ── MODAL ──────────────────────────────────────────────────── */
+.admin-shell .modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  /* Inherit variables from admin-shell since modal is fixed/out of flow */
+  --bg-card: #1e293b;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --bg-hover: #273548;
+}
+
+.admin-shell .modal {
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: 20px;
+  width: 95%;
+  max-width: 600px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* ── FORM FIELDS ────────────────────────────────────────────── */
+/* Used in: Products modal — was completely missing */
+.admin-shell .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.admin-shell .form-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-shell .form-field input,
+.admin-shell .form-field textarea {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-shell .form-field input:focus,
+.admin-shell .form-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.admin-shell .form-field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .admin-shell.dash-page .kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-shell {
+    padding: 1rem 1.2rem;
+  }
+
+  .admin-shell.dash-page .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-shell.inv-page .inv-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-shell .stock-btn,
+  .admin-shell .tab-btn {
+    padding: 10px 14px;
+    min-height: 40px;
+  }
+
+  .admin-shell .card {
+    overflow-x: auto;
+  }
+
+  .admin-shell .filter-container {
+    gap: 6px;
+  }
+
+  .admin-shell .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-shell.dash-page .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   LOGIN PAGE — .admin-shell.login-container
+   Command-center aesthetic: dark, precise, no-nonsense.
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap");
+
+.admin-shell.login-container {
+  /* Override shell layout for full-screen centering */
+  max-width: 100%;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+
+  /* Grid background — subtle command-center feel */
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Glowing orb — top left atmosphere */
+.admin-shell.login-container::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  left: -120px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.12) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Glowing orb — bottom right atmosphere */
+.admin-shell.login-container::after {
+  content: "";
+  position: absolute;
+  bottom: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.08) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ── LOGIN CARD ─────────────────────────────────────────────── */
+.admin-shell.login-container .login-card {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-card);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  margin: 1rem;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 24px 60px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(99, 102, 241, 0.06);
+
+  /* Entrance animation */
+  animation: loginFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes loginFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── LOGIN HEADER ───────────────────────────────────────────── */
+.admin-shell.login-container .login-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.admin-shell.login-container .login-logo {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 14px;
+}
+
+.admin-shell.login-container .login-header h1 {
+  font-family: "Syne", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+
+.admin-shell.login-container .login-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-family: "DM Mono", monospace;
+}
+
+/* ── ERROR STATE ────────────────────────────────────────────── */
+.admin-shell.login-container .login-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  color: var(--danger);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  animation: loginFadeUp 0.2s ease both;
+}
+
+/* ── FORM ───────────────────────────────────────────────────── */
+.admin-shell.login-container .login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.admin-shell.login-container .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-shell.login-container .form-group label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: "DM Mono", monospace;
+}
+
+.admin-shell.login-container .form-group input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: "DM Sans", sans-serif;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-shell.login-container .form-group input::placeholder {
+  color: rgba(148, 163, 184, 0.4);
+  font-family: "DM Mono", monospace;
+  font-size: 0.85rem;
+}
+
+.admin-shell.login-container .form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* ── SUBMIT BUTTON ──────────────────────────────────────────── */
+.admin-shell.login-container .login-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "Syne", sans-serif;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.admin-shell.login-container .login-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+}
+
+.admin-shell.login-container .login-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.admin-shell.login-container .login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .admin-shell.login-container .login-card {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+}
+
+/* ============================================================
+   INVENTORY PAGE — Professional variant management
+   ============================================================ */
+
+/* ── STAT CARDS ─────────────────────────────────────────────── */
+.admin-shell.inv-page .inv-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-shell.inv-page .inv-stat-card {
+  padding: 1.4rem 1.6rem;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-shell.inv-page .inv-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+}
+
+.admin-shell.inv-page .inv-stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── SEARCH ─────────────────────────────────────────────────── */
+.admin-shell.inv-page .inv-search-wrap {
+  margin-bottom: 1rem;
+}
+
+.admin-shell.inv-page .inv-search {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 16px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.admin-shell.inv-page .inv-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.admin-shell.inv-page .inv-search::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── PRODUCT LIST ───────────────────────────────────────────── */
+.admin-shell.inv-page .inv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── PRODUCT BLOCK (card per product) ───────────────────────── */
+.admin-shell.inv-page .inv-product-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.admin-shell.inv-page .inv-product-block.is-expanded {
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ── PRODUCT HEADER ROW ─────────────────────────────────────── */
+.admin-shell.inv-page .inv-product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  cursor: pointer;
+  gap: 1rem;
+  transition: background 0.1s ease;
+  user-select: none;
+}
+
+.admin-shell.inv-page .inv-product-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-shell.inv-page .inv-product-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-shell.inv-page .inv-chevron {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.admin-shell.inv-page .inv-chevron.open {
+  transform: rotate(90deg);
+  color: var(--accent);
+}
+
+.admin-shell.inv-page .inv-product-name-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-shell.inv-page .inv-product-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.4;
+}
+
+.admin-shell.inv-page .inv-product-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-shell.inv-page .inv-category-chip {
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.admin-shell.inv-page .inv-product-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.admin-shell.inv-page .inv-total-stock {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── BADGES ─────────────────────────────────────────────────── */
+.admin-shell.inv-page .inv-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.admin-shell.inv-page .inv-badge-out {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.admin-shell.inv-page .inv-badge-low {
+  background: rgba(234, 179, 8, 0.12);
+  color: #fde047;
+}
+
+/* ── VARIANTS PANEL ─────────────────────────────────────────── */
+.admin-shell.inv-page .inv-variants-panel {
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.15);
+  padding: 0 1.2rem 1rem;
+  animation: invPanelOpen 0.2s ease both;
+}
+
+@keyframes invPanelOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-shell.inv-page .inv-variants-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 120px;
+  gap: 1rem;
+  padding: 0.75rem 0 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.4rem;
+}
+
+.admin-shell.inv-page .inv-variants-loading,
+.admin-shell.inv-page .inv-variants-empty {
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ── VARIANT ROW ────────────────────────────────────────────── */
+.admin-shell.inv-page .inv-variant-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 120px;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.admin-shell.inv-page .inv-variant-row:last-child {
+  border-bottom: none;
+}
+
+.admin-shell.inv-page .inv-variant-info {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-shell.inv-page .inv-variant-chip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.admin-shell.inv-page .inv-chip-color {
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+}
+
+.admin-shell.inv-page .inv-chip-size {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+/* ── STOCK BAR ──────────────────────────────────────────────── */
+.admin-shell.inv-page .inv-variant-stock-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-shell.inv-page .inv-stock-bar-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.admin-shell.inv-page .inv-stock-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
+}
+
+.admin-shell.inv-page .inv-stock-number {
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ── VARIANT CONTROLS ───────────────────────────────────────── */
+.admin-shell.inv-page .inv-variant-controls {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.admin-shell.inv-page .inv-ctrl-btn {
+  padding: 5px 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 34px;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-shell.inv-page .inv-summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .admin-shell.inv-page .inv-variants-header,
+  .admin-shell.inv-page .inv-variant-row {
+    grid-template-columns: 1fr 1.5fr 100px;
+    gap: 0.6rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-shell.inv-page .inv-summary {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stack product row vertically on mobile */
+  .admin-shell.inv-page .inv-product-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .admin-shell.inv-page .inv-product-left {
+    width: 100%;
+  }
+
+  .admin-shell.inv-page .inv-product-right {
+    padding-left: 28px; /* align with name, past the chevron */
+  }
+
+  /* Hide column headers — layout goes stacked */
+  .admin-shell.inv-page .inv-variants-header {
+    display: none;
+  }
+
+  /* Each variant becomes a stacked card */
+  .admin-shell.inv-page .inv-variant-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0.9rem 0;
+  }
+
+  .admin-shell.inv-page .inv-variant-info {
+    width: 100%;
+  }
+
+  /* Stock bar + number always visible, full width */
+  .admin-shell.inv-page .inv-variant-stock-wrap {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .admin-shell.inv-page .inv-stock-bar-track {
+    flex: 1;
+  }
+
+  /* Buttons stretch full width with large tap targets */
+  .admin-shell.inv-page .inv-variant-controls {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .admin-shell.inv-page .inv-ctrl-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 1.1rem;
+    min-height: 44px;
+  }
+}
