@@ -9,41 +9,40 @@ import ProductImage from "./productImage.model.js";
 
 // Establecer relaciones entre modelos
 // Product can have many variants 1 -> N
-Product.hasMany(ProductVariant, { 
-    foreignKey: "productId", 
-    as: "variants" ,
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
+Product.hasMany(ProductVariant, {
+  foreignKey: "productId",
+  as: "variants",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
-ProductVariant.belongsTo(Product, { 
-    foreignKey: "productId", 
-    as: "product" ,
-    
+ProductVariant.belongsTo(Product, {
+  foreignKey: "productId",
+  as: "product",
 });
 
 Order.hasMany(Order_items, {
-    foreignKey: "orderId",
-    as: "items",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
+  foreignKey: "orderId",
+  as: "items",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 Order_items.belongsTo(Order, {
-    foreignKey: "orderId",
-    as: "order",
+  foreignKey: "orderId",
+  as: "order",
 });
 
 ProductVariant.hasMany(Order_items, {
-    foreignKey: "productVariantId",
-    as: "orderItems",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
+  foreignKey: "productVariantId",
+  as: "orderItems",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
 });
 
 Order_items.belongsTo(ProductVariant, {
-    foreignKey: "productVariantId",
-    as: "productVariant",
+  foreignKey: "productVariantId",
+  as: "productVariant",
 });
 
 // ProductVariant can have many images 1 -> N
@@ -54,15 +53,15 @@ ProductVariant.hasMany(ProductImage, {
 // Each image belongs to one variant
 ProductImage.belongsTo(ProductVariant, {
   foreignKey: "productVariantId",
+  as: "variant",
 });
 
-
-export{
-    sequelize,
-    User,
-    Product,
-    ProductVariant,
-    Order,
-    Order_items,
-    ProductImage,
-}
+export {
+  sequelize,
+  User,
+  Product,
+  ProductVariant,
+  Order,
+  Order_items,
+  ProductImage,
+};

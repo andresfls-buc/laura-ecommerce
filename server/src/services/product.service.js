@@ -1,273 +1,207 @@
-import { Product, ProductVariant, ProductImage, sequelize } from "../models/index.js";
+import {
+  Product,
+  ProductVariant,
+  ProductImage,
+  sequelize,
+} from "../models/index.js";
 import Boom from "@hapi/boom";
 
 class ProductService {
-
-  // Create product + variants
+  /**
+   * CREATE PRODUCT + VARIANTS
+   */
   static async createProduct(data) {
-    if (!data || !data.name) {
-      throw Boom.badRequest("Product name is required");
-    }
+    if (!data || !data.name) throw Boom.badRequest("Product name is required");
 
-    const transaction = await sequelize.transaction();
-
-    try {
+    const newId = await sequelize.transaction(async (t) => {
       const product = await Product.create(
         {
           name: data.name,
           description: data.description ?? null,
         },
-        { transaction }
+        { transaction: t }
       );
 
-      // Create or merge variants
       if (data.variants && Array.isArray(data.variants)) {
-        for (const variantData of data.variants) {
-          if (
-            !variantData.size ||
-            !variantData.color ||
-            variantData.price === undefined ||
-            variantData.stock === undefined
-          ) {
-            throw Boom.badRequest(
-              "Each variant must have size, color, price, and stock"
-            );
-          }
-
-          const existingVariant = await ProductVariant.findOne({
-            where: {
+        for (const v of data.variants) {
+          await ProductVariant.create(
+            {
               productId: product.id,
-              size: variantData.size,
-              color: variantData.color,
+              size: v.size,
+              color: v.color,
+              price: v.price,
+              stock: v.stock,
             },
-            transaction,
-          });
-
-          if (existingVariant) {
-            existingVariant.stock += variantData.stock;
-            existingVariant.price = variantData.price;
-            await existingVariant.save({ transaction });
-          } else {
-            await ProductVariant.create(
-              {
-                productId: product.id,
-                size: variantData.size,
-                color: variantData.color,
-                price: variantData.price,
-                stock: variantData.stock,
-              },
-              { transaction }
-            );
-          }
+            { transaction: t }
+          );
         }
       }
+      return product.id;
+    });
 
-      await transaction.commit();
+    return await this.getProductById(newId);
+  }
 
-      return await Product.findByPk(product.id, {
-        include: [
-          { model: ProductVariant, as: "variants" },
-          { model: ProductImage, as: "images" },   // ✅ Added
-        ],
+  /**
+   * UPDATE PRODUCT + VARIANTS
+   * FIXED: Separated transaction from the final fetch to prevent 500 post-commit errors.
+   */
+  static async updateProduct(id, data) {
+    console.log("--- STARTING UPDATE ---");
+    console.log("Incoming Data:", JSON.stringify(data, null, 2));
+
+    try {
+      const result = await sequelize.transaction(async (t) => {
+        const product = await Product.findByPk(id, { transaction: t });
+        if (!product) throw Boom.notFound("Product not found");
+
+        console.log("Product found. Updating basic info...");
+
+        // Update basic info
+        await product.update(
+          {
+            name: data.name ?? product.name,
+            description: data.description ?? product.description,
+          },
+          { transaction: t }
+        );
+
+        if (data.variants && Array.isArray(data.variants)) {
+          console.log(`Updating ${data.variants.length} variants...`);
+          for (const vData of data.variants) {
+            if (!vData.id) continue;
+
+            const variant = await ProductVariant.findOne({
+              where: { id: vData.id, productId: id },
+              transaction: t,
+            });
+
+            if (variant) {
+              await variant.update(
+                {
+                  size: vData.size ?? variant.size,
+                  color: vData.color ?? variant.color,
+                  price: vData.price ?? variant.price,
+                  stock: vData.stock ?? variant.stock,
+                },
+                { transaction: t }
+              );
+            }
+          }
+        }
+
+        console.log(
+          "Updates finished. Attempting final fetch inside transaction..."
+        );
+
+        // This is likely where it crashes
+        return await Product.findByPk(id, {
+          include: [
+            {
+              model: ProductVariant,
+              as: "variants",
+              include: [{ model: ProductImage, as: "images" }],
+            },
+          ],
+          transaction: t,
+        });
       });
 
+      console.log("Transaction committed successfully!");
+      return result;
     } catch (error) {
-      await transaction.rollback();
+      console.error("!!! REAL ERROR DETECTED !!!");
+      console.error("Message:", error.message);
+      console.error("Stack Trace:", error.stack);
+
+      // Re-throw so the controller knows it failed
+      if (error.isBoom) throw error;
       throw Boom.badImplementation(error.message);
     }
   }
 
-  // Update product + variants
-  static async updateProduct(id, data) {
-    const transaction = await sequelize.transaction();
+  /**
+   * GET PRODUCT BY ID (Centralized fetch logic)
+   */
+  static async getProductById(id) {
+    const numericId = Number(id);
+    if (isNaN(numericId)) return null;
 
-    try {
-      const product = await Product.findByPk(id, { transaction });
-      if (!product) throw Boom.notFound("Product not found");
-
-      await product.update(
+    const product = await Product.findByPk(numericId, {
+      include: [
         {
-          name: data.name ?? product.name,
-          description: data.description ?? product.description,
+          model: ProductVariant,
+          as: "variants",
+          include: [{ model: ProductImage, as: "images" }],
         },
-        { transaction }
-      );
+      ],
+    });
 
-      if (data.variants && Array.isArray(data.variants)) {
-        for (const variantData of data.variants) {
-          const existingVariant = await ProductVariant.findOne({
-            where: { id: variantData.id, productId: product.id },
-            transaction,
-          });
-
-          if (!existingVariant) {
-            throw Boom.notFound(
-              `Variant with id ${variantData.id} not found`
-            );
-          }
-
-          await existingVariant.update(
-            {
-              size: variantData.size ?? existingVariant.size,
-              color: variantData.color ?? existingVariant.color,
-              price: variantData.price ?? existingVariant.price,
-              stock: variantData.stock ?? existingVariant.stock,
-            },
-            { transaction }
-          );
-        }
-      }
-
-      await transaction.commit();
-
-      return await Product.findByPk(product.id, {
-        include: [
-          { model: ProductVariant, as: "variants" },
-          { model: ProductImage, as: "images" },   // ✅ Added
-        ],
-      });
-
-    } catch (error) {
-      await transaction.rollback();
-      if (error.isBoom) throw error;
-      throw Boom.badImplementation("Failed to update product");
-    }
+    // Use .get({ plain: true }) to prevent circular JSON 500 errors
+    return product ? product.get({ plain: true }) : null;
   }
 
-  // Delete product
+  /**
+   * GET ALL PRODUCTS
+   */
+  static async getAllProducts() {
+    const products = await Product.findAll({
+      include: [
+        {
+          model: ProductVariant,
+          as: "variants",
+          include: [{ model: ProductImage, as: "images" }],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+    return products.map((p) => p.get({ plain: true }));
+  }
+
   static async deleteProduct(id) {
     const product = await Product.findByPk(id);
     if (!product) throw Boom.notFound("Product not found");
-
-    await product.destroy(); // images auto-delete because CASCADE
+    await product.destroy();
     return { message: "Product deleted successfully" };
   }
 
-  // Get product by ID (with variants + images)
-  static async getProductById(id) {
-  const numericId = Number(id);
-  if (isNaN(numericId)) return null;
-
-  const product = await Product.findByPk(numericId, {
-    include: [
-      {
-        model: ProductVariant,
-        as: "variants",
-        include: [
-          {
-            model: ProductImage,
-            as: "images",
-          },
-        ],
-      },
-    ],
-  });
-
-  return product;
-}
-  // Get all products
-static async getAllProducts() {
-  return await Product.findAll({
-    include: [
-      {
-        model: ProductVariant,
-        as: "variants",
-        include: [
-          {
-            model: ProductImage,
-            as: "images",
-          },
-        ],
-      },
-    ],
-    order: [["createdAt", "DESC"]],
-  });
-}
-  // Get variants only
   static async getProductVariants(productId, filters = {}) {
     const { size, color } = filters;
-
     const whereClause = { productId };
     if (size) whereClause.size = size;
     if (color) whereClause.color = color;
-
-    return await ProductVariant.findAll({ where: whereClause });
-  }
-  // Add image to a specific variant of a specific product
-static async addImageToVariant(variantId, data, productId) {
-  const { imageUrl, publicId } = data;
-
-  if (!imageUrl || !publicId) {
-    throw Boom.badRequest("imageUrl and publicId are required");
+    const variants = await ProductVariant.findAll({
+      where: whereClause,
+      include: [{ model: ProductImage, as: "images" }],
+    });
+    return variants.map((v) => v.get({ plain: true }));
   }
 
-  // Find the variant and make sure it belongs to the specified product
-  const variant = await ProductVariant.findOne({
-    where: {
-      id: variantId,
-      productId: productId, // ✅ ensures variant belongs to the correct product
-    },
-  });
+  static async addImageToVariant(variantId, data, productId) {
+    const variant = await ProductVariant.findOne({
+      where: { id: variantId, productId },
+    });
+    if (!variant) throw Boom.notFound("Variant not found");
 
-  if (!variant) {
-    throw Boom.notFound(
-      `Variant with ID ${variantId} not found for Product ID ${productId}`
-    );
-  }
-
-  // Count existing images to set order automatically
-  const existingImagesCount = await ProductImage.count({
-    where: { productVariantId: variantId },
-  });
-
-  const image = await ProductImage.create({
-    imageUrl,
-    publicId,
-    order: existingImagesCount + 1, // automatically assign next order
-    productVariantId: variantId,
-  });
-
-  return image;
-}
-  // Update variant image
-static async updateVariantImage(imageId, data) {
-  const image = await ProductImage.findByPk(imageId);
-
-  if (!image) {
-    throw Boom.notFound("Image not found");
-  }
-
-  const updatedData = {
-    imageUrl: data.imageUrl ?? image.imageUrl,
-    publicId: data.publicId ?? image.publicId,
-  };
-
-  // Only handle order if client provides it
-  if (data.order !== undefined && data.order !== image.order) {
-    const newOrder = data.order;
-
-    // Get all other images for the same variant
-    const otherImages = await ProductImage.findAll({
-      where: {
-        productVariantId: image.productVariantId,
-        id: { [sequelize.Op.ne]: imageId },
-      },
+    const existingImagesCount = await ProductImage.count({
+      where: { productVariantId: variantId },
     });
 
-    // Shift orders to make room for newOrder
-    for (const other of otherImages) {
-      if (newOrder <= other.order) {
-        await other.update({ order: other.order + 1 });
-      }
-    }
-
-    updatedData.order = newOrder;
+    const image = await ProductImage.create({
+      imageUrl: data.imageUrl,
+      publicId: data.publicId,
+      order: existingImagesCount + 1,
+      productVariantId: variantId,
+    });
+    return image.get({ plain: true });
   }
 
-  await image.update(updatedData);
-
-  return image;
-}
+  static async updateVariantImage(imageId, data) {
+    const image = await ProductImage.findByPk(imageId);
+    if (!image) throw Boom.notFound("Image not found");
+    await image.update(data);
+    return image.get({ plain: true });
+  }
 }
 
 export default ProductService;

@@ -1,0 +1,275 @@
+/* =========================
+   BUTTONS
+========================= */
+
+.orders-page .btn {
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orders-page .btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.orders-page .btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.orders-page .btn-sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.orders-page .table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.orders-page table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+}
+
+.orders-page th,
+.orders-page td {
+  white-space: nowrap;
+  padding: 0.85rem 1rem;
+}
+
+/* prevent column squeezing */
+
+.orders-page th:nth-child(1),
+.orders-page td:nth-child(1) {
+  width: 70px;
+}
+
+.orders-page th:nth-child(2),
+.orders-page td:nth-child(2) {
+  width: 240px;
+}
+
+.orders-page th:nth-child(3),
+.orders-page td:nth-child(3) {
+  width: 120px;
+}
+
+.orders-page th:nth-child(4),
+.orders-page td:nth-child(4) {
+  width: 140px;
+}
+
+.orders-page th:nth-child(5),
+.orders-page td:nth-child(5) {
+  width: 120px;
+}
+
+.orders-page th:nth-child(6),
+.orders-page td:nth-child(6) {
+  width: 120px;
+}
+
+.orders-page th:nth-child(7),
+.orders-page td:nth-child(7) {
+  width: 120px;
+}
+
+.orders-page th:nth-child(8),
+.orders-page td:nth-child(8) {
+  width: 110px;
+}
+
+/* =========================
+   CLICKABLE ROWS
+========================= */
+
+.orders-page .order-row {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.orders-page .order-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* =========================
+   FILTER TABS
+========================= */
+
+.orders-page .filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.orders-page .filter-tab {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+  text-transform: capitalize;
+}
+
+.orders-page .filter-tab:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text);
+}
+
+.orders-page .filter-tab.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.orders-page .tab-count {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+}
+
+/* =========================
+   ORDER DETAIL MODAL
+========================= */
+
+.orders-page .order-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.orders-page .order-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.orders-page .section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.orders-page .detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0;
+  font-size: 0.85rem;
+  gap: 1rem;
+}
+
+.orders-page .detail-row span:first-child {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.orders-page .detail-row strong {
+  text-align: right;
+}
+
+.orders-page .total-row {
+  border-top: 1px solid var(--border);
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+  font-size: 0.95rem;
+}
+
+/* =========================
+   STATUS UPDATE
+========================= */
+
+.orders-page .status-update-section {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+.orders-page .status-btns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.orders-page .status-btn {
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-transform: capitalize;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+}
+
+.orders-page .status-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.orders-page .status-btn.active {
+  background: var(--accent);
+  color: #0f172a;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.orders-page .status-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+  /* hide some columns instead of breaking layout */
+
+  .orders-page th:nth-child(3),
+  .orders-page td:nth-child(3),
+  .orders-page th:nth-child(7),
+  .orders-page td:nth-child(7) {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .orders-page .order-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
