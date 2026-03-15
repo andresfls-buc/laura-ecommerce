@@ -1,25 +1,25 @@
-/* Home.css */
+/* ── Home.css ─────────────────────────────────────────────────── */
 
 .home-container {
   font-family: Arial, sans-serif;
   color: #333;
 }
 
-/* Banner grande */
+/* ── BANNER ─────────────────────────────────────────────────── */
 .banner-section {
-  background-color: #111; /* temporal sin imagen */
-  padding: 100px 20px;
+  background-color: #111;
+  padding: 80px 20px;
   text-align: center;
   color: white;
 }
 
 .banner-title {
-  font-size: 48px;
+  font-size: 2.4rem;
   margin-bottom: 10px;
 }
 
 .banner-subtitle {
-  font-size: 20px;
+  font-size: 1.1rem;
   margin-bottom: 20px;
 }
 
@@ -27,78 +27,80 @@
   background-color: #e91e63;
   color: white;
   padding: 12px 24px;
-  font-size: 16px;
+  font-size: 1rem;
   border: none;
   cursor: pointer;
   border-radius: 5px;
 }
 
-/* Productos destacados */
+/* ── PRODUCTS SECTION ───────────────────────────────────────── */
 .products-section {
-  padding: 40px 20px;
+  padding: 40px 16px;
   text-align: center;
 }
 
 .section-title {
-  font-size: 32px;
+  font-size: 1.6rem;
   margin-bottom: 20px;
 }
 
+/* 2 columns on mobile, 3 on tablet, 4 on desktop */
 .products-grid {
   display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
 }
 
-.product-card {
-  border: 1px solid #ddd;
-  padding: 16px;
-  border-radius: 8px;
-  text-align: center;
+@media (min-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
 }
 
-.product-image {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  margin-bottom: 12px;
-  background-color: #eee; /* placeholder */
+@media (min-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
 }
 
-.product-name {
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
-.product-price {
-  color: #e91e63;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-/* Colecciones */
+/* ── COLLECTIONS SECTION ────────────────────────────────────── */
 .collections-section {
-  padding: 40px 20px;
+  padding: 40px 16px;
   text-align: center;
 }
 
 .collections-grid {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .collections-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
 }
 
 .collection-card {
-  width: 180px;
-  text-align: center;
   cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
 }
 
 .collection-img {
   width: 100%;
-  height: 120px;
-  background-color: #ddd; /* cajas grises temporales */
-  margin-bottom: 10px;
-  border-radius: 8px;
+  height: 100%;
+  border-radius: 10px;
+  background-color: #ddd;
+  transition: transform 0.3s ease;
+}
+
+.collection-card:hover .collection-img {
+  transform: scale(1.03);
 }

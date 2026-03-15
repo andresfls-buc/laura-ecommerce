@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap");
+
 /* ============================================================
    ADMIN-ONLY STYLES — Scoped to .admin-shell
    Single source of truth for all 4 admin pages.
@@ -8,7 +10,7 @@
 .admin-shell {
   --bg: #0f172a;
   --bg-card: #1e293b;
-  --bg-hover: #273548; /* was missing — used in Products */
+  --bg-hover: #273548;
   --border: rgba(255, 255, 255, 0.08);
   --text: #f1f5f9;
   --text-muted: #94a3b8;
@@ -172,7 +174,7 @@
 }
 
 /* ── ORDER ROW HOVER ────────────────────────────────────────── */
-/* Used in: Orders — fixed selector (was on shell, should be on tr) */
+/* Used in: Orders */
 .admin-shell .order-row-hover {
   cursor: pointer;
   transition: background 0.1s ease;
@@ -182,8 +184,124 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* ── DASHBOARD: KPI GRID ────────────────────────────────────── */
-/* Used in: Dashboard — was completely missing */
+/* ── STOCK CONTROL ──────────────────────────────────────────── */
+/* Used in: Products variants modal */
+.admin-shell .stock-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-shell .stock-control .stock-btn {
+  padding: 4px 12px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ── MODAL ──────────────────────────────────────────────────── */
+.admin-shell .modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  /* Re-declare variables — modal is fixed/out of flow */
+  --bg-card: #1e293b;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --bg-hover: #273548;
+  --danger: #f87171;
+}
+
+.admin-shell .modal {
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: 20px;
+  width: 95%;
+  max-width: 600px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* ── FORM FIELDS ────────────────────────────────────────────── */
+/* Used in: Products modal */
+.admin-shell .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.admin-shell .form-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-shell .form-field input,
+.admin-shell .form-field textarea {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-shell .form-field input:focus,
+.admin-shell .form-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.admin-shell .form-field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* ── RESPONSIVE — GLOBAL ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-shell {
+    padding: 1rem 1.2rem;
+  }
+
+  .admin-shell .stock-btn,
+  .admin-shell .tab-btn {
+    padding: 10px 14px;
+    min-height: 40px;
+  }
+
+  .admin-shell .card {
+    overflow-x: auto;
+  }
+
+  .admin-shell .filter-container {
+    gap: 6px;
+  }
+
+  .admin-shell .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ============================================================
+   DASHBOARD PAGE — .admin-shell.dash-page
+   ============================================================ */
+
 .admin-shell.dash-page .kpi-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -239,108 +357,6 @@
   text-overflow: ellipsis;
 }
 
-/* ── INVENTORY: SUMMARY GRID ────────────────────────────────── */
-/* Used in: Inventory */
-.admin-shell.inv-page .inv-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.admin-shell.inv-page .inv-summary .card {
-  padding: 1.5rem;
-  text-align: center;
-  margin-top: 0;
-}
-
-/* ── PRODUCTS: STOCK CONTROL ────────────────────────────────── */
-/* Used in: Products variants modal */
-.admin-shell .stock-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.admin-shell .stock-control .stock-btn {
-  padding: 4px 12px;
-  font-size: 1rem;
-  line-height: 1;
-}
-
-/* ── MODAL ──────────────────────────────────────────────────── */
-.admin-shell .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  /* Inherit variables from admin-shell since modal is fixed/out of flow */
-  --bg-card: #1e293b;
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-  --accent: #6366f1;
-  --bg-hover: #273548;
-}
-
-.admin-shell .modal {
-  background: var(--bg-card);
-  padding: 2rem;
-  border-radius: 20px;
-  width: 95%;
-  max-width: 600px;
-  border: 1px solid var(--border);
-  color: var(--text);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-/* ── FORM FIELDS ────────────────────────────────────────────── */
-/* Used in: Products modal — was completely missing */
-.admin-shell .form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 1rem;
-}
-
-.admin-shell .form-field label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.admin-shell .form-field input,
-.admin-shell .form-field textarea {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: var(--text);
-  font-size: 0.9rem;
-  font-family: inherit;
-  transition: border-color 0.15s ease;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.admin-shell .form-field input:focus,
-.admin-shell .form-field textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.admin-shell .form-field textarea {
-  min-height: 90px;
-  resize: vertical;
-}
-
-/* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .admin-shell.dash-page .kpi-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -348,35 +364,8 @@
 }
 
 @media (max-width: 768px) {
-  .admin-shell {
-    padding: 1rem 1.2rem;
-  }
-
   .admin-shell.dash-page .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .admin-shell.inv-page .inv-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-shell .stock-btn,
-  .admin-shell .tab-btn {
-    padding: 10px 14px;
-    min-height: 40px;
-  }
-
-  .admin-shell .card {
-    overflow-x: auto;
-  }
-
-  .admin-shell .filter-container {
-    gap: 6px;
-  }
-
-  .admin-shell .page-header {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
 
@@ -388,13 +377,9 @@
 
 /* ============================================================
    LOGIN PAGE — .admin-shell.login-container
-   Command-center aesthetic: dark, precise, no-nonsense.
    ============================================================ */
 
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap");
-
 .admin-shell.login-container {
-  /* Override shell layout for full-screen centering */
   max-width: 100%;
   min-height: 100vh;
   padding: 0;
@@ -404,8 +389,6 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-
-  /* Grid background — subtle command-center feel */
   background-color: var(--bg);
   background-image:
     linear-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px),
@@ -413,7 +396,6 @@
   background-size: 40px 40px;
 }
 
-/* Glowing orb — top left atmosphere */
 .admin-shell.login-container::before {
   content: "";
   position: absolute;
@@ -429,7 +411,6 @@
   pointer-events: none;
 }
 
-/* Glowing orb — bottom right atmosphere */
 .admin-shell.login-container::after {
   content: "";
   position: absolute;
@@ -445,7 +426,6 @@
   pointer-events: none;
 }
 
-/* ── LOGIN CARD ─────────────────────────────────────────────── */
 .admin-shell.login-container .login-card {
   position: relative;
   z-index: 1;
@@ -460,8 +440,6 @@
     0 0 0 1px rgba(255, 255, 255, 0.04),
     0 24px 60px rgba(0, 0, 0, 0.5),
     0 0 80px rgba(99, 102, 241, 0.06);
-
-  /* Entrance animation */
   animation: loginFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -476,7 +454,6 @@
   }
 }
 
-/* ── LOGIN HEADER ───────────────────────────────────────────── */
 .admin-shell.login-container .login-header {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -511,7 +488,6 @@
   font-family: "DM Mono", monospace;
 }
 
-/* ── ERROR STATE ────────────────────────────────────────────── */
 .admin-shell.login-container .login-error {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.25);
@@ -524,7 +500,6 @@
   animation: loginFadeUp 0.2s ease both;
 }
 
-/* ── FORM ───────────────────────────────────────────────────── */
 .admin-shell.login-container .login-form {
   display: flex;
   flex-direction: column;
@@ -573,7 +548,6 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
-/* ── SUBMIT BUTTON ──────────────────────────────────────────── */
 .admin-shell.login-container .login-btn {
   margin-top: 0.5rem;
   width: 100%;
@@ -610,7 +584,6 @@
   transform: none;
 }
 
-/* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .admin-shell.login-container .login-card {
     padding: 2rem 1.5rem;
@@ -619,10 +592,9 @@
 }
 
 /* ============================================================
-   INVENTORY PAGE — Professional variant management
+   INVENTORY PAGE — .admin-shell.inv-page
    ============================================================ */
 
-/* ── STAT CARDS ─────────────────────────────────────────────── */
 .admin-shell.inv-page .inv-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -652,7 +624,6 @@
   letter-spacing: 0.06em;
 }
 
-/* ── SEARCH ─────────────────────────────────────────────────── */
 .admin-shell.inv-page .inv-search-wrap {
   margin-bottom: 1rem;
 }
@@ -679,14 +650,12 @@
   color: var(--text-muted);
 }
 
-/* ── PRODUCT LIST ───────────────────────────────────────────── */
 .admin-shell.inv-page .inv-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* ── PRODUCT BLOCK (card per product) ───────────────────────── */
 .admin-shell.inv-page .inv-product-block {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -699,7 +668,6 @@
   border-color: rgba(99, 102, 241, 0.3);
 }
 
-/* ── PRODUCT HEADER ROW ─────────────────────────────────────── */
 .admin-shell.inv-page .inv-product-row {
   display: flex;
   align-items: center;
@@ -784,7 +752,6 @@
   white-space: nowrap;
 }
 
-/* ── BADGES ─────────────────────────────────────────────────── */
 .admin-shell.inv-page .inv-badge {
   display: inline-block;
   padding: 3px 8px;
@@ -806,7 +773,6 @@
   color: #fde047;
 }
 
-/* ── VARIANTS PANEL ─────────────────────────────────────────── */
 .admin-shell.inv-page .inv-variants-panel {
   border-top: 1px solid var(--border);
   background: rgba(0, 0, 0, 0.15);
@@ -847,7 +813,6 @@
   font-size: 0.85rem;
 }
 
-/* ── VARIANT ROW ────────────────────────────────────────────── */
 .admin-shell.inv-page .inv-variant-row {
   display: grid;
   grid-template-columns: 1fr 2fr 120px;
@@ -885,7 +850,6 @@
   color: var(--text-muted);
 }
 
-/* ── STOCK BAR ──────────────────────────────────────────────── */
 .admin-shell.inv-page .inv-variant-stock-wrap {
   display: flex;
   align-items: center;
@@ -915,7 +879,6 @@
   text-align: right;
 }
 
-/* ── VARIANT CONTROLS ───────────────────────────────────────── */
 .admin-shell.inv-page .inv-variant-controls {
   display: flex;
   gap: 6px;
@@ -930,7 +893,6 @@
   min-width: 34px;
 }
 
-/* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .admin-shell.inv-page .inv-summary {
     grid-template-columns: repeat(3, 1fr);
@@ -948,7 +910,6 @@
     grid-template-columns: 1fr;
   }
 
-  /* Stack product row vertically on mobile */
   .admin-shell.inv-page .inv-product-row {
     flex-direction: column;
     align-items: flex-start;
@@ -960,15 +921,13 @@
   }
 
   .admin-shell.inv-page .inv-product-right {
-    padding-left: 28px; /* align with name, past the chevron */
+    padding-left: 28px;
   }
 
-  /* Hide column headers — layout goes stacked */
   .admin-shell.inv-page .inv-variants-header {
     display: none;
   }
 
-  /* Each variant becomes a stacked card */
   .admin-shell.inv-page .inv-variant-row {
     display: flex;
     flex-direction: column;
@@ -981,7 +940,6 @@
     width: 100%;
   }
 
-  /* Stock bar + number always visible, full width */
   .admin-shell.inv-page .inv-variant-stock-wrap {
     display: flex;
     width: 100%;
@@ -993,7 +951,6 @@
     flex: 1;
   }
 
-  /* Buttons stretch full width with large tap targets */
   .admin-shell.inv-page .inv-variant-controls {
     width: 100%;
     justify-content: flex-start;
@@ -1006,4 +963,633 @@
     font-size: 1.1rem;
     min-height: 44px;
   }
+}
+
+/* ============================================================
+   PRODUCTS PAGE — .admin-shell.prod-page
+   ============================================================ */
+
+/* ── ADD BUTTON ─────────────────────────────────────────────── */
+.admin-shell .prod-add-btn {
+  padding: 0 20px;
+  width: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── TABLE WRAPPER — horizontal scroll on mobile ────────────── */
+.admin-shell .prod-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* min-width stops columns from collapsing on narrow viewports */
+.admin-shell .prod-table {
+  min-width: 520px;
+}
+
+/* ── ROW HOVER ──────────────────────────────────────────────── */
+.admin-shell .prod-row {
+  transition: background 0.1s ease;
+}
+
+.admin-shell .prod-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ── NAME CELL ──────────────────────────────────────────────── */
+.admin-shell .prod-name-cell {
+  min-width: 180px;
+}
+
+.admin-shell .prod-name-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-shell .prod-thumb {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.admin-shell .prod-thumb-placeholder {
+  background: var(--bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.admin-shell .prod-name-text {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.admin-shell .prod-id-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── DESCRIPTION CELL ───────────────────────────────────────── */
+.admin-shell .prod-desc-cell {
+  max-width: 300px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical; /* stylelint-disable-line */
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* ── ACTIONS CELL ───────────────────────────────────────────── */
+/* width:1% + white-space:nowrap forces the cell to shrink-wrap
+   its content — browser can NEVER squish or clip the buttons  */
+.admin-shell .prod-actions-th {
+  text-align: right;
+}
+
+.admin-shell .prod-actions-cell {
+  width: 1%;
+  white-space: nowrap;
+  padding-right: 1.2rem;
+}
+
+.admin-shell .prod-btn-group {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.admin-shell .prod-action-btn {
+  font-size: 0.72rem;
+  padding: 5px 11px;
+  white-space: nowrap;
+}
+
+.admin-shell .prod-action-danger {
+  color: var(--danger);
+}
+
+.admin-shell .prod-action-danger:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+/* ── MODAL SHARED ───────────────────────────────────────────── */
+.admin-shell .prod-modal-title {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-shell .prod-modal-title--sm {
+  font-size: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.admin-shell .prod-modal-subtitle {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.admin-shell .prod-modal-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--danger);
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.admin-shell .prod-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 2rem;
+}
+
+.admin-shell .prod-modal-save {
+  flex: 1;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.admin-shell .prod-modal-save:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.admin-shell .prod-modal-cancel {
+  flex: 1;
+  background: transparent;
+}
+
+.admin-shell .prod-modal-close {
+  width: 100%;
+  margin-top: 1.5rem;
+  flex: unset;
+}
+
+/* ── VARIANTS MODAL ─────────────────────────────────────────── */
+.admin-shell .prod-variants-modal {
+  max-width: 640px;
+}
+
+/* Scrollable variant list */
+.admin-shell .prod-variants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* ── VARIANT CARD ───────────────────────────────────────────── */
+.admin-shell .prod-variant-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: border-color 0.15s ease;
+}
+
+.admin-shell .prod-variant-card:hover {
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* ── IMAGE SLOT ─────────────────────────────────────────────── */
+.admin-shell .prod-variant-img-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.admin-shell .prod-variant-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.admin-shell .prod-variant-img-empty {
+  background: var(--bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+}
+
+.admin-shell .prod-variant-img-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 70px;
+}
+
+.admin-shell .prod-img-btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* Higher specificity to override .stock-btn defaults without !important */
+.admin-shell .prod-variant-img-actions .prod-img-btn {
+  font-size: 0.65rem;
+  padding: 4px 6px;
+}
+
+/* ── VARIANT BODY ───────────────────────────────────────────── */
+.admin-shell .prod-variant-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.admin-shell .prod-variant-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-shell .prod-variant-color-chip {
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.admin-shell .prod-variant-sep {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.admin-shell .prod-variant-size-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── STOCK CONTROL inside variant card ──────────────────────── */
+.admin-shell .prod-stock-control {
+  gap: 10px;
+}
+
+.admin-shell .stock-control-btn {
+  padding: 4px 14px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.admin-shell .prod-stock-count {
+  min-width: 32px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* ── RESPONSIVE — PRODUCTS ──────────────────────────────────── */
+
+/* Hide description on small phones — buttons always stay visible */
+@media (max-width: 600px) {
+  .admin-shell .prod-desc-th,
+  .admin-shell .prod-desc-cell {
+    display: none;
+  }
+}
+
+/* Stack variant card vertically on very small screens */
+@media (max-width: 480px) {
+  .admin-shell .prod-variant-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-shell .prod-variant-img-slot {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
+
+  .admin-shell .prod-variant-img-actions {
+    flex-direction: row;
+    width: auto;
+    flex: 1;
+  }
+
+  .admin-shell .prod-img-btn {
+    width: auto;
+    flex: 1;
+  }
+}
+/* ── CREATE/EDIT MODAL EXTRAS ───────────────────────────────── */
+.admin-shell .prod-create-modal {
+  max-width: 680px;
+  max-height: 92vh;
+}
+
+/* Section labels inside modal */
+.admin-shell .prod-modal-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-shell .prod-modal-section-label--mt {
+  margin-top: 1.5rem;
+}
+
+.admin-shell .prod-modal-section-hint {
+  font-weight: 400;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+/* ── PRODUCT IMAGE UPLOAD ROW ───────────────────────────────── */
+.admin-shell .prod-img-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-shell .prod-img-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.admin-shell .prod-img-preview-empty {
+  background: var(--bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+/* ── VARIANT FORM CARDS ─────────────────────────────────────── */
+.admin-shell .prod-variants-form-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* One card per variant */
+.admin-shell .prod-variant-form-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Card top bar: "Variant N" label + Remove button */
+.admin-shell .prod-variant-form-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-shell .prod-variant-form-card-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 2×2 grid: Size | Color / Price | Stock */
+.admin-shell .prod-variant-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.admin-shell .prod-variant-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-shell .prod-variant-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-shell .prod-variant-input {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.admin-shell .prod-variant-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.admin-shell .prod-variant-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+/* Remove button — small, right-aligned */
+.admin-shell .prod-variant-remove {
+  font-size: 0.72rem;
+  padding: 4px 10px;
+}
+
+.admin-shell .prod-variant-remove:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* Add variant button */
+.admin-shell .prod-variant-add-btn {
+  margin-bottom: 1.5rem;
+  border-style: dashed;
+  width: 100%;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.admin-shell .prod-variant-add-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+/* ── VARIANT IMAGE SLOTS (create modal + viewer) ────────────── */
+
+/* Row of image thumbnails inside a variant card */
+.admin-shell .prod-variant-img-row,
+.admin-shell .prod-variant-viewer-imgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Individual thumbnail slot */
+.admin-shell .prod-variant-img-slot-sm {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.admin-shell .prod-variant-img-sm {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+/* Remove button overlaid on thumbnail */
+.admin-shell .prod-variant-img-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: transform 0.1s ease;
+}
+
+.admin-shell .prod-variant-img-remove:hover {
+  transform: scale(1.15);
+}
+
+/* "Add Photo" dashed button — same size as thumbnail */
+.admin-shell .prod-variant-img-add {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  border: 1.5px dashed var(--border);
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.admin-shell .prod-variant-img-add:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.admin-shell .prod-variant-img-add:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-shell .prod-variant-img-add span:first-child {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.admin-shell .prod-variant-img-add-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Save status message */
+.admin-shell .prod-save-status {
+  font-size: 0.82rem;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  animation: prodStatusPulse 1s ease infinite alternate;
+}
+
+@keyframes prodStatusPulse {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Viewer modal — variant card layout update (info on top, images below) */
+.admin-shell .prod-variants-modal .prod-variant-card {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-shell .prod-variants-modal .prod-variant-body {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
