@@ -44,20 +44,17 @@ class ProductService {
 
   /**
    * UPDATE PRODUCT + VARIANTS
-   * FIXED: Separated transaction from the final fetch to prevent 500 post-commit errors.
    */
   static async updateProduct(id, data) {
     console.log("--- STARTING UPDATE ---");
     console.log("Incoming Data:", JSON.stringify(data, null, 2));
 
     try {
-      const result = await sequelize.transaction(async (t) => {
+      await sequelize.transaction(async (t) => {
         const product = await Product.findByPk(id, { transaction: t });
         if (!product) throw Boom.notFound("Product not found");
 
-        console.log("Product found. Updating basic info...");
-
-        // Update basic info
+        // 1. Update basic product info
         await product.update(
           {
             name: data.name ?? product.name,
@@ -66,62 +63,70 @@ class ProductService {
           { transaction: t }
         );
 
+        // 2. Handle variants
         if (data.variants && Array.isArray(data.variants)) {
-          console.log(`Updating ${data.variants.length} variants...`);
+          const incomingIds = data.variants
+            .filter((v) => v.id)
+            .map((v) => v.id);
+
+          // 🗑️ Delete variants removed in the form
+          await ProductVariant.destroy({
+            where: {
+              productId: id,
+              id: { [sequelize.Sequelize.Op.notIn]: incomingIds },
+            },
+            transaction: t,
+          });
+
           for (const vData of data.variants) {
-            if (!vData.id) continue;
+            if (vData.id) {
+              // ✏️ Update existing variant
+              const variant = await ProductVariant.findOne({
+                where: { id: vData.id, productId: id },
+                transaction: t,
+              });
 
-            const variant = await ProductVariant.findOne({
-              where: { id: vData.id, productId: id },
-              transaction: t,
-            });
-
-            if (variant) {
-              await variant.update(
+              if (variant) {
+                await variant.update(
+                  {
+                    size: vData.size ?? variant.size,
+                    color: vData.color ?? variant.color,
+                    price: vData.price ?? variant.price,
+                    stock: vData.stock ?? variant.stock,
+                  },
+                  { transaction: t }
+                );
+              }
+            } else {
+              // 🆕 Create new variant
+              await ProductVariant.create(
                 {
-                  size: vData.size ?? variant.size,
-                  color: vData.color ?? variant.color,
-                  price: vData.price ?? variant.price,
-                  stock: vData.stock ?? variant.stock,
+                  productId: id,
+                  size: vData.size,
+                  color: vData.color,
+                  price: vData.price,
+                  stock: vData.stock,
                 },
                 { transaction: t }
               );
             }
           }
         }
-
-        console.log(
-          "Updates finished. Attempting final fetch inside transaction..."
-        );
-
-        // This is likely where it crashes
-        return await Product.findByPk(id, {
-          include: [
-            {
-              model: ProductVariant,
-              as: "variants",
-              include: [{ model: ProductImage, as: "images" }],
-            },
-          ],
-          transaction: t,
-        });
       });
 
       console.log("Transaction committed successfully!");
-      return result;
+      return await this.getProductById(id);
     } catch (error) {
       console.error("!!! REAL ERROR DETECTED !!!");
       console.error("Message:", error.message);
       console.error("Stack Trace:", error.stack);
-
-      // Re-throw so the controller knows it failed
       if (error.isBoom) throw error;
       throw Boom.badImplementation(error.message);
     }
   }
 
   /**
-   * GET PRODUCT BY ID (Centralized fetch logic)
+   * GET PRODUCT BY ID
    */
   static async getProductById(id) {
     const numericId = Number(id);
@@ -137,8 +142,15 @@ class ProductService {
       ],
     });
 
-    // Use .get({ plain: true }) to prevent circular JSON 500 errors
-    return product ? product.get({ plain: true }) : null;
+    if (!product) return null;
+
+    const plain = product.get({ plain: true });
+    // ✅ Sort variants numerically by size
+    plain.variants = plain.variants.sort(
+      (a, b) => Number(a.size) - Number(b.size)
+    );
+
+    return plain;
   }
 
   /**
@@ -155,7 +167,15 @@ class ProductService {
       ],
       order: [["createdAt", "DESC"]],
     });
-    return products.map((p) => p.get({ plain: true }));
+
+    return products.map((p) => {
+      const plain = p.get({ plain: true });
+      // ✅ Sort variants numerically by size
+      plain.variants = plain.variants.sort(
+        (a, b) => Number(a.size) - Number(b.size)
+      );
+      return plain;
+    });
   }
 
   static async deleteProduct(id) {
@@ -165,16 +185,24 @@ class ProductService {
     return { message: "Product deleted successfully" };
   }
 
+  /**
+   * GET PRODUCT VARIANTS (with filters)
+   */
   static async getProductVariants(productId, filters = {}) {
     const { size, color } = filters;
     const whereClause = { productId };
     if (size) whereClause.size = size;
     if (color) whereClause.color = color;
+
     const variants = await ProductVariant.findAll({
       where: whereClause,
       include: [{ model: ProductImage, as: "images" }],
     });
-    return variants.map((v) => v.get({ plain: true }));
+
+    // ✅ Sort variants numerically by size
+    return variants
+      .map((v) => v.get({ plain: true }))
+      .sort((a, b) => Number(a.size) - Number(b.size));
   }
 
   static async addImageToVariant(variantId, data, productId) {
