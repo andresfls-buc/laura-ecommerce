@@ -33,44 +33,68 @@ class OrderService {
       const variantsMap = {};
 
       for (const item of items) {
-        const variant = await ProductVariant.findByPk(item.productVariantId, { transaction });
-        if (!variant) throw Boom.notFound(`Product variant ${item.productVariantId} not found`);
-        if (variant.stock < item.quantity) throw Boom.conflict(`Not enough stock for variant ${variant.id}`);
+        const variant = await ProductVariant.findByPk(item.productVariantId, {
+          transaction,
+        });
+        if (!variant)
+          throw Boom.notFound(
+            `Product variant ${item.productVariantId} not found`
+          );
+        if (variant.stock < item.quantity)
+          throw Boom.conflict(`Not enough stock for variant ${variant.id}`);
 
         subtotal += Number(variant.price) * item.quantity;
         totalUnits += item.quantity;
         variantsMap[item.productVariantId] = variant;
       }
 
-      const totalAmount = subtotal + SHIPPING_COST;
+      // ── FREE SHIPPING: 3 or more units ──────────────────────────────────
+      const freeShipping = totalUnits >= 3;
+      const shippingCost = freeShipping ? 0 : SHIPPING_COST;
+
+      // ── CREDIT CARD SURCHARGE: 5% on (subtotal + shippingCost) ──────────
+      const isCreditCard = paymentMethod === "credit_card";
+      const baseAmount = subtotal + shippingCost;
+      const creditCardSurcharge = isCreditCard
+        ? Math.round(baseAmount * 0.05)
+        : 0;
+      const totalAmount = baseAmount + creditCardSurcharge;
+
       const reference = `ORDER-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-      const order = await Order.create({
-        userId: userId || null,
-        customerName,
-        customerEmail,
-        customerPhone: customerPhone || null,
-        shippingAddress,
-        shippingCity,
-        shippingPostalCode,
-        paymentMethod,
-        totalUnits,
-        subtotal,
-        shippingCost: SHIPPING_COST,
-        totalAmount,
-        reference,
-        status: "pending",
-        paymentStatus: "unpaid",
-      }, { transaction });
+      const order = await Order.create(
+        {
+          userId: userId || null,
+          customerName,
+          customerEmail,
+          customerPhone: customerPhone || null,
+          shippingAddress,
+          shippingCity,
+          shippingPostalCode,
+          paymentMethod,
+          totalUnits,
+          subtotal,
+          shippingCost, // 0 if free shipping
+          creditCardSurcharge, // 0 if not credit card — ⚠️ needs DB column
+          totalAmount,
+          reference,
+          status: "pending",
+          paymentStatus: "unpaid",
+        },
+        { transaction }
+      );
 
       for (const item of items) {
         const variant = variantsMap[item.productVariantId];
-        await Order_items.create({
-          orderId: order.id,
-          productVariantId: variant.id,
-          quantity: item.quantity,
-          priceAtPurchase: variant.price,
-        }, { transaction });
+        await Order_items.create(
+          {
+            orderId: order.id,
+            productVariantId: variant.id,
+            quantity: item.quantity,
+            priceAtPurchase: variant.price,
+          },
+          { transaction }
+        );
 
         variant.stock -= item.quantity;
         await variant.save({ transaction });
@@ -78,16 +102,14 @@ class OrderService {
 
       await transaction.commit();
 
-      // RETURN LOCAL VARIABLES TO GUARANTEE DATA
       return {
         order: order,
         checkout: {
-          reference: reference, 
+          reference: reference,
           amountInCents: Math.round(totalAmount * 100),
           currency: "COP",
         },
       };
-
     } catch (error) {
       if (transaction) await transaction.rollback();
       throw error;
@@ -96,14 +118,26 @@ class OrderService {
 
   static async getAllOrders() {
     return await Order.findAll({
-      include: [{ model: Order_items, as: "items", include: [{ model: ProductVariant, as: "productVariant" }] }],
+      include: [
+        {
+          model: Order_items,
+          as: "items",
+          include: [{ model: ProductVariant, as: "productVariant" }],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
   }
 
   static async getOrderById(orderId) {
     const order = await Order.findByPk(orderId, {
-      include: [{ model: Order_items, as: "items", include: [{ model: ProductVariant, as: "productVariant" }] }],
+      include: [
+        {
+          model: Order_items,
+          as: "items",
+          include: [{ model: ProductVariant, as: "productVariant" }],
+        },
+      ],
     });
     if (!order) throw Boom.notFound("Order not found");
     return order;
@@ -120,7 +154,9 @@ class OrderService {
       cancelled: [],
     };
     if (!allowedTransitions[order.status].includes(newStatus)) {
-      throw Boom.badRequest(`Cannot change order status from '${order.status}' to '${newStatus}'`);
+      throw Boom.badRequest(
+        `Cannot change order status from '${order.status}' to '${newStatus}'`
+      );
     }
     order.status = newStatus;
     await order.save();
@@ -130,11 +166,17 @@ class OrderService {
   static async cancelOrder(orderId) {
     const transaction = await sequelize.transaction();
     try {
-      const order = await Order.findByPk(orderId, { include: [{ model: Order_items, as: "items" }], transaction });
+      const order = await Order.findByPk(orderId, {
+        include: [{ model: Order_items, as: "items" }],
+        transaction,
+      });
       if (!order) throw Boom.notFound("Order not found");
-      if (order.status === "cancelled") throw Boom.badRequest("Order already cancelled");
+      if (order.status === "cancelled")
+        throw Boom.badRequest("Order already cancelled");
       for (const item of order.items) {
-        const variant = await ProductVariant.findByPk(item.productVariantId, { transaction });
+        const variant = await ProductVariant.findByPk(item.productVariantId, {
+          transaction,
+        });
         variant.stock += item.quantity;
         await variant.save({ transaction });
       }

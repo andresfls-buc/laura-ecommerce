@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { FiX, FiUser, FiMail, FiPhone, FiMapPin, FiMap, FiHash } from "react-icons/fi";
+import {
+  FiX,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiMap,
+  FiHash,
+  FiCreditCard,
+} from "react-icons/fi";
 import "./CheckoutModal.css";
 
 const initialForm = {
@@ -9,6 +18,7 @@ const initialForm = {
   shippingAddress: "",
   shippingCity: "",
   shippingPostalCode: "",
+  paymentMethod: "wompi", // default
 };
 
 const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
@@ -17,7 +27,8 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!form.customerName.trim()) newErrors.customerName = "El nombre es obligatorio.";
+    if (!form.customerName.trim())
+      newErrors.customerName = "El nombre es obligatorio.";
     if (!form.customerEmail.trim()) {
       newErrors.customerEmail = "El correo es obligatorio.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerEmail)) {
@@ -28,8 +39,10 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
     } else if (!/^\d{7,15}$/.test(form.customerPhone.replace(/\s/g, ""))) {
       newErrors.customerPhone = "Ingresa un teléfono válido.";
     }
-    if (!form.shippingAddress.trim()) newErrors.shippingAddress = "La dirección es obligatoria.";
-    if (!form.shippingCity.trim()) newErrors.shippingCity = "La ciudad es obligatoria.";
+    if (!form.shippingAddress.trim())
+      newErrors.shippingAddress = "La dirección es obligatoria.";
+    if (!form.shippingCity.trim())
+      newErrors.shippingCity = "La ciudad es obligatoria.";
     if (!form.shippingPostalCode.trim()) {
       newErrors.shippingPostalCode = "El código postal es obligatorio.";
     } else if (!/^\d{4,10}$/.test(form.shippingPostalCode)) {
@@ -42,6 +55,15 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  // ── Toggle credit card surcharge ────────────────────────────────────────
+  const handleCreditCardToggle = () => {
+    setForm((prev) => ({
+      ...prev,
+      paymentMethod:
+        prev.paymentMethod === "credit_card" ? "wompi" : "credit_card",
+    }));
   };
 
   const handleSubmit = () => {
@@ -57,6 +79,8 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
     if (e.target === e.currentTarget) onClose();
   };
 
+  const isCreditCard = form.paymentMethod === "credit_card";
+
   if (!isOpen) return null;
 
   return (
@@ -68,7 +92,11 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
             <span className="modal-step">Paso 1 de 2</span>
             <h2 className="modal-title">Datos de envío</h2>
           </div>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Cerrar">
+          <button
+            className="modal-close-btn"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
             <FiX />
           </button>
         </div>
@@ -92,7 +120,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 value={form.customerName}
                 onChange={handleChange}
               />
-              {errors.customerName && <span className="error-msg">{errors.customerName}</span>}
+              {errors.customerName && (
+                <span className="error-msg">{errors.customerName}</span>
+              )}
             </div>
 
             {/* Email */}
@@ -108,7 +138,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 value={form.customerEmail}
                 onChange={handleChange}
               />
-              {errors.customerEmail && <span className="error-msg">{errors.customerEmail}</span>}
+              {errors.customerEmail && (
+                <span className="error-msg">{errors.customerEmail}</span>
+              )}
             </div>
 
             {/* Teléfono */}
@@ -124,7 +156,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 value={form.customerPhone}
                 onChange={handleChange}
               />
-              {errors.customerPhone && <span className="error-msg">{errors.customerPhone}</span>}
+              {errors.customerPhone && (
+                <span className="error-msg">{errors.customerPhone}</span>
+              )}
             </div>
 
             {/* Dirección */}
@@ -140,7 +174,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 value={form.shippingAddress}
                 onChange={handleChange}
               />
-              {errors.shippingAddress && <span className="error-msg">{errors.shippingAddress}</span>}
+              {errors.shippingAddress && (
+                <span className="error-msg">{errors.shippingAddress}</span>
+              )}
             </div>
 
             {/* Ciudad */}
@@ -156,7 +192,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 value={form.shippingCity}
                 onChange={handleChange}
               />
-              {errors.shippingCity && <span className="error-msg">{errors.shippingCity}</span>}
+              {errors.shippingCity && (
+                <span className="error-msg">{errors.shippingCity}</span>
+              )}
             </div>
 
             {/* Código Postal */}
@@ -175,6 +213,29 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
               {errors.shippingPostalCode && (
                 <span className="error-msg">{errors.shippingPostalCode}</span>
               )}
+            </div>
+          </div>
+
+          {/* ── Credit Card Toggle ─────────────────────────────────────────── */}
+          <div
+            className={`credit-card-toggle ${isCreditCard ? "active" : ""}`}
+            onClick={handleCreditCardToggle}
+          >
+            <div className="credit-card-toggle-left">
+              <FiCreditCard className="credit-card-icon" />
+              <div className="credit-card-toggle-text">
+                <span className="credit-card-label">
+                  Pagar con tarjeta de crédito
+                </span>
+                <span className="credit-card-sublabel">
+                  {isCreditCard
+                    ? "Se aplicará un recargo del 5% sobre el total"
+                    : "Aplica un recargo del 5% sobre el total"}
+                </span>
+              </div>
+            </div>
+            <div className={`toggle-switch ${isCreditCard ? "on" : "off"}`}>
+              <div className="toggle-knob" />
             </div>
           </div>
         </div>
