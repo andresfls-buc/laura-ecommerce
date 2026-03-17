@@ -3,7 +3,7 @@
   padding: 4rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .cart-title {
@@ -86,7 +86,7 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
-  height: 100px; /* Aligns with image height */
+  height: 100px;
 }
 
 .cart-card-price p {
@@ -95,7 +95,7 @@
   margin: 0;
 }
 
-/* ✅ NEW PROFESSIONAL DELETE BUTTON */
+/* DELETE BUTTON */
 .delete-icon-btn {
   background: #f8f8f8;
   color: #333;
@@ -149,6 +149,57 @@
   color: #000;
 }
 
+/* ── NEW: Free shipping badge ── */
+.free-shipping-badge {
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ── NEW: Free shipping message banner ── */
+.free-shipping-msg {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* ── NEW: Surcharge note row (dimmed) ── */
+.summary-row.summary-note {
+  color: #aaa;
+  font-size: 0.82rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+/* ── NEW: Divider before total ── */
+.summary-divider {
+  height: 1px;
+  background: #eee;
+  margin: 0.75rem 0 1rem;
+}
+
+/* ── NEW: Total row ── */
+.summary-row.summary-total {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #000;
+  margin-bottom: 0.5rem;
+}
+
+/* ── NEW: Disclaimer below total ── */
+.summary-disclaimer {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 0.4rem;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
 .checkout-btn {
   width: 100%;
   padding: 1.2rem;
@@ -165,6 +216,11 @@
 
 .checkout-btn:hover {
   background: #e91e63;
+}
+
+.checkout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* RESPONSIVE */

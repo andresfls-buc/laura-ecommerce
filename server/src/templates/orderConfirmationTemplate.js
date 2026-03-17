@@ -1,6 +1,19 @@
-export const orderConfirmationTemplate = (order, orderItems, storeEmail, storeName) => {
+export const orderConfirmationTemplate = (
+  order,
+  orderItems,
+  storeEmail,
+  storeName
+) => {
   const formatCOP = (amount) =>
-    new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(amount);
+    new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(amount);
+
+  const freeShipping =
+    Number(order.shippingCost) === 0 && order.totalUnits >= 3;
+  const hasCreditCardSurcharge = Number(order.creditCardSurcharge) > 0;
 
   const itemsRows = orderItems
     .map(
@@ -99,18 +112,55 @@ export const orderConfirmationTemplate = (order, orderItems, storeEmail, storeNa
           <tr>
             <td style="background-color: #ffffff; padding: 0 40px 28px;">
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 16px;">
+
                 <tr>
                   <td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Subtotal</td>
                   <td style="padding: 6px 0; text-align: right; color: #1a1a1a; font-size: 14px;">${formatCOP(order.subtotal)}</td>
                 </tr>
+
+                <!-- ── Envío: free or fixed ── -->
                 <tr>
                   <td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Envío</td>
-                  <td style="padding: 6px 0; text-align: right; color: #1a1a1a; font-size: 14px;">${formatCOP(order.shippingCost)}</td>
+                  <td style="padding: 6px 0; text-align: right; font-size: 14px;">
+                    ${
+                      freeShipping
+                        ? `<span style="color: #16a34a; font-weight: 700;">¡Gratis! 🎉</span>`
+                        : `<span style="color: #1a1a1a;">${formatCOP(order.shippingCost)}</span>`
+                    }
+                  </td>
                 </tr>
+
+                <!-- ── Free shipping banner ── -->
+                ${
+                  freeShipping
+                    ? `
+                <tr>
+                  <td colspan="2" style="padding: 4px 0 8px;">
+                    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #15803d; font-weight: 500;">
+                      🎉 ¡Compraste ${order.totalUnits} productos y obtuviste envío gratis!
+                    </div>
+                  </td>
+                </tr>`
+                    : ""
+                }
+
+                <!-- ── Credit card surcharge ── -->
+                ${
+                  hasCreditCardSurcharge
+                    ? `
+                <tr>
+                  <td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Recargo tarjeta de crédito (5%)</td>
+                  <td style="padding: 6px 0; text-align: right; color: #b45309; font-size: 14px; font-weight: 600;">${formatCOP(order.creditCardSurcharge)}</td>
+                </tr>`
+                    : ""
+                }
+
+                <!-- ── Total ── -->
                 <tr>
                   <td style="padding: 14px 0 0; border-top: 2px solid #f0f0f0; color: #1a1a1a; font-size: 16px; font-weight: 800;">Total Pagado</td>
                   <td style="padding: 14px 0 0; border-top: 2px solid #f0f0f0; text-align: right; color: #1b4332; font-size: 18px; font-weight: 800;">${formatCOP(order.totalAmount)}</td>
                 </tr>
+
               </table>
             </td>
           </tr>

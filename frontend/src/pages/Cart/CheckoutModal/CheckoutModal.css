@@ -14,8 +14,12 @@
 }
 
 @keyframes overlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ── Modal container ── */
@@ -24,15 +28,23 @@
   border-radius: 20px;
   width: 100%;
   max-width: 560px;
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.22), 0 8px 24px rgba(0,0,0,0.1);
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.22),
+    0 8px 24px rgba(0, 0, 0, 0.1);
   animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
-  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(28px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* ── Header ── */
@@ -76,7 +88,9 @@
   cursor: pointer;
   color: #555;
   font-size: 1rem;
-  transition: background 0.18s, color 0.18s;
+  transition:
+    background 0.18s,
+    color 0.18s;
   flex-shrink: 0;
   margin-top: 4px;
 }
@@ -136,7 +150,10 @@
   color: #111;
   background: #fafafa;
   outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s,
+    background 0.18s;
   width: 100%;
   box-sizing: border-box;
 }
@@ -167,6 +184,101 @@
   margin-top: 2px;
 }
 
+/* ── Credit Card Toggle ── */
+.credit-card-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 12px;
+  background: #fafafa;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
+  user-select: none;
+}
+
+.credit-card-toggle:hover {
+  border-color: #c4b5fd;
+  background: #fdf8ff;
+}
+
+.credit-card-toggle.active {
+  border-color: #8b5cf6;
+  background: #f3eeff;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.credit-card-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.credit-card-icon {
+  font-size: 1.3rem;
+  color: #8b5cf6;
+  flex-shrink: 0;
+}
+
+.credit-card-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.credit-card-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.credit-card-sublabel {
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 400;
+}
+
+.credit-card-toggle.active .credit-card-sublabel {
+  color: #7c3aed;
+  font-weight: 500;
+}
+
+/* ── Toggle Switch ── */
+.toggle-switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #e0e0e0;
+  position: relative;
+  transition: background 0.22s;
+  flex-shrink: 0;
+}
+
+.toggle-switch.on {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggle-switch.on .toggle-knob {
+  transform: translateX(20px);
+}
+
 /* ── Footer ── */
 .modal-footer {
   display: flex;
@@ -186,7 +298,10 @@
   font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.18s, color 0.18s, background 0.18s;
+  transition:
+    border-color 0.18s,
+    color 0.18s,
+    background 0.18s;
 }
 .btn-cancel:hover:not(:disabled) {
   border-color: #bbb;
@@ -208,7 +323,10 @@
   font-weight: 700;
   cursor: pointer;
   letter-spacing: 0.01em;
-  transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+  transition:
+    opacity 0.18s,
+    transform 0.15s,
+    box-shadow 0.18s;
   box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
 }
 .btn-pay:hover:not(:disabled) {
@@ -235,7 +353,7 @@
 .spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255,255,255,0.35);
+  border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.65s linear infinite;
@@ -243,7 +361,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Responsive ── */

@@ -5,6 +5,9 @@ import { FiTrash2 } from "react-icons/fi";
 import CheckoutModal from "./CheckoutModal";
 import "./Cart.css";
 
+const SHIPPING_COST = 18000;
+const FREE_SHIPPING_THRESHOLD = 3;
+
 const Cart = () => {
   const { cartItems, setCartItems } = useCart();
   const [loading, setLoading] = useState(false);
@@ -13,7 +16,7 @@ const Cart = () => {
 
   const items = cartItems || [];
 
-  // Actualizar cantidad con validación de stock
+  // ── Quantity & remove ───────────────────────────────────────────────────
   const updateQuantity = (id, delta) => {
     const updatedItems = items.map((item) => {
       if (item.productVariantId === id) {
@@ -30,19 +33,21 @@ const Cart = () => {
     setCartItems(updatedItems);
   };
 
-  // Eliminar producto del carrito
   const removeItem = (id) => {
     const filtered = items.filter((item) => item.productVariantId !== id);
     setCartItems(filtered);
   };
 
-  // Calcular total de la compra
-  const total = items.reduce(
+  // ── Price calculations (mirrors backend logic for display) ──────────────
+  const totalUnits = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  const subtotal = items.reduce(
     (acc, item) => acc + Number(item.price) * (item.quantity || 1),
     0
   );
+  const freeShipping = totalUnits >= FREE_SHIPPING_THRESHOLD;
+  const shippingCost = freeShipping ? 0 : SHIPPING_COST;
 
-  // Esperar a que el script de Wompi esté listo
+  // ── Wompi ready check ───────────────────────────────────────────────────
   const waitForWompi = () =>
     new Promise((resolve, reject) => {
       if (window.WidgetCheckout) return resolve();
@@ -59,14 +64,14 @@ const Cart = () => {
       }, 250);
     });
 
-  // Función principal de Checkout — recibe los datos del formulario
+  // ── Main checkout handler — receives full form including paymentMethod ───
   const handleCreateOrder = async (customerData) => {
     if (!items.length) return;
 
     try {
       setLoading(true);
 
-      // 1. Crear la orden en el backend con los datos reales del cliente
+      // 1. Create order — send paymentMethod from the modal form
       const response = await fetch("http://localhost:3000/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,7 +82,7 @@ const Cart = () => {
           shippingAddress: customerData.shippingAddress,
           shippingCity: customerData.shippingCity,
           shippingPostalCode: customerData.shippingPostalCode,
-          paymentMethod: "wompi",
+          paymentMethod: customerData.paymentMethod, // ✅ dynamic now
           items: items.map((item) => ({
             productVariantId: item.productVariantId,
             quantity: item.quantity,
@@ -92,7 +97,6 @@ const Cart = () => {
         return;
       }
 
-      // 2. Extraer datos para el Widget
       const paymentData = result.data?.checkout;
 
       if (!paymentData) {
@@ -110,11 +114,10 @@ const Cart = () => {
         return;
       }
 
-      // 3. Esperar a que Wompi esté listo
+      // 2. Wait for Wompi widget
       await waitForWompi();
 
-      // 4. Inicializar Widget de Wompi
-      // redirectUrl is only included in production — Wompi blocks localhost URLs
+      // 3. Launch Wompi widget with the final amount (already includes surcharge if credit card)
       const widgetConfig = {
         currency: paymentData.currency || "COP",
         amountInCents: Number(amountToPay),
@@ -132,7 +135,7 @@ const Cart = () => {
 
       const handler = new window.WidgetCheckout(widgetConfig);
 
-      // 5. Abrir el modal de pago
+      // 4. Handle Wompi response
       handler.open(async (res) => {
         console.log("Wompi callback:", res);
         const transaction = res.transaction;
@@ -150,7 +153,7 @@ const Cart = () => {
         } else if (transaction.status === "DECLINED") {
           alert("El pago fue rechazado.");
         }
-      }); // ✅ closes handler.open()
+      });
     } catch (error) {
       console.error("Error en handleCreateOrder:", error);
       alert("Hubo un error de conexión.");
@@ -166,9 +169,12 @@ const Cart = () => {
       </div>
     );
 
+  // ── Surcharge is shown only when user has toggled credit card in the modal
+  // We derive it from a local state passed up from the modal if needed,
+  // but for the summary we show a note instead (modal handles the toggle live)
+
   return (
     <>
-      {/* Checkout Modal — appears before payment */}
       <CheckoutModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -229,13 +235,51 @@ const Cart = () => {
             ))}
           </div>
 
+          {/* ── Order Summary ─────────────────────────────────────────────── */}
           <div className="cart-summary">
             <h3>Resumen</h3>
+
             <div className="summary-row">
-              <span>Total</span>
-              <span>${total.toLocaleString("es-CO")}</span>
+              <span>Subtotal</span>
+              <span>${subtotal.toLocaleString("es-CO")} COP</span>
             </div>
-            {/* Opens the checkout modal instead of calling the API directly */}
+
+            <div className="summary-row">
+              <span>Envío</span>
+              <span>
+                {freeShipping ? (
+                  <span className="free-shipping-badge">¡Gratis! 🎉</span>
+                ) : (
+                  `$${shippingCost.toLocaleString("es-CO")} COP`
+                )}
+              </span>
+            </div>
+
+            {freeShipping && (
+              <div className="free-shipping-msg">
+                🎉 ¡Llevas {totalUnits} productos, el envío es gratis!
+              </div>
+            )}
+
+            <div className="summary-row summary-note">
+              <span>Recargo tarjeta de crédito</span>
+              <span>5% (si aplica)</span>
+            </div>
+
+            <div className="summary-divider" />
+
+            <div className="summary-row summary-total">
+              <span>Total estimado</span>
+              <span>
+                ${(subtotal + shippingCost).toLocaleString("es-CO")} COP
+              </span>
+            </div>
+
+            <p className="summary-disclaimer">
+              * El recargo del 5% se aplicará si pagas con tarjeta de crédito.
+              El total final se calculará al confirmar.
+            </p>
+
             <button
               className="checkout-btn"
               disabled={loading}
