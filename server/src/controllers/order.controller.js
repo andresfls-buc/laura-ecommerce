@@ -28,7 +28,7 @@ export const createOrder = async (req, res, next) => {
     // Strict Order: reference + amountInCents + currency + redirectUrl + integritySecret
     // ✅ Correct — no redirectUrl in the signature
     const rawSignatureString = `${reference}${amountInCents}${currency}${integritySecret}`;
-    
+
     const signature = crypto
       .createHash("sha256")
       .update(rawSignatureString)
@@ -95,12 +95,37 @@ export const updateOrderStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+
+    // Debug logging
+    console.log("=== Update Order Status ===");
+    console.log("Order ID:", id);
+    console.log("New Status:", status);
+    console.log("Request Body:", req.body);
+    console.log("Content-Type:", req.headers["content-type"]);
+
+    // Validation
+    if (!status) {
+      return res.status(400).json({
+        status: "error",
+        message: "Status is required in request body",
+        receivedBody: req.body,
+        hint: "Make sure express.json() middleware is configured before routes",
+      });
+    }
+
     const updatedOrder = await OrderService.updateOrderStatus(id, status);
+
+    console.log(
+      "✅ Order status updated successfully to:",
+      updatedOrder.status
+    );
+
     return res.status(200).json({
       status: "success",
       data: updatedOrder,
     });
   } catch (error) {
+    console.error("❌ Update status error:", error.message);
     return next(error);
   }
 };

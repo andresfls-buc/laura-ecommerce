@@ -244,7 +244,11 @@ body,
   padding: 2rem;
   background: var(--bg-deep);
   box-sizing: border-box;
-  overflow-x: hidden;
+
+  /* ✅ FIXED */
+  overflow-x: auto;
+  min-width: 0;
+
   transition: margin-left 0.3s ease;
 }
 
@@ -298,6 +302,9 @@ body,
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+
+  /* ✅ PREVENT COLUMN SQUEEZE */
+  min-width: 700px;
 }
 
 .admin-shell thead th {

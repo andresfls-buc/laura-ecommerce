@@ -3,7 +3,6 @@
 /* ============================================================
    ADMIN-ONLY STYLES — Scoped to .admin-shell
    Single source of truth for all 4 admin pages.
-   NO inline styles needed after this file.
    ============================================================ */
 
 /* ── DESIGN TOKENS ─────────────────────────────────────────── */
@@ -20,7 +19,6 @@
   --success: #4ade80;
   --warning: #fde047;
 
-  /* Layout */
   background-color: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -34,7 +32,6 @@
 }
 
 /* ── PAGE HEADER ────────────────────────────────────────────── */
-/* Used in: Dashboard, Orders, Products, Inventory */
 .admin-shell .page-header {
   display: flex;
   align-items: center;
@@ -95,7 +92,6 @@
 }
 
 /* ── LOADING / EMPTY STATES ─────────────────────────────────── */
-/* Used in: all pages */
 .admin-shell .loading-state,
 .admin-shell .empty-state {
   padding: 4rem;
@@ -139,7 +135,6 @@
 }
 
 /* ── FILTER TABS ROW ────────────────────────────────────────── */
-/* Used in: Orders */
 .admin-shell .filter-container {
   display: flex;
   flex-wrap: wrap;
@@ -147,7 +142,38 @@
   margin-bottom: 1.5rem;
 }
 
-/* ── BADGES ─────────────────────────────────────────────────── */
+/* ── STATUS TEXT (replaces badges) ──────────────────────────── */
+.admin-shell .status-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.admin-shell .status-paid {
+  color: var(--success);
+}
+
+.admin-shell .status-pending {
+  color: var(--warning);
+}
+
+.admin-shell .status-cancelled {
+  color: var(--danger);
+}
+
+.admin-shell .status-shipped {
+  color: #a5b4fc;
+}
+
+.admin-shell .status-delivered {
+  color: var(--success);
+}
+
+.admin-shell .status-processing {
+  color: #60a5fa;
+}
+
+/* ── LEGACY BADGES (kept for backwards compatibility) ───────── */
 .admin-shell .badge {
   display: inline-block;
   padding: 4px 10px;
@@ -173,8 +199,12 @@
   color: var(--warning);
 }
 
+.admin-shell .badge-blue {
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+}
+
 /* ── ORDER ROW HOVER ────────────────────────────────────────── */
-/* Used in: Orders */
 .admin-shell .order-row-hover {
   cursor: pointer;
   transition: background 0.1s ease;
@@ -185,7 +215,6 @@
 }
 
 /* ── STOCK CONTROL ──────────────────────────────────────────── */
-/* Used in: Products variants modal */
 .admin-shell .stock-control {
   display: flex;
   align-items: center;
@@ -207,7 +236,6 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  /* Re-declare variables — modal is fixed/out of flow */
   --bg-card: #1e293b;
   --border: rgba(255, 255, 255, 0.08);
   --text: #f1f5f9;
@@ -231,7 +259,6 @@
 }
 
 /* ── FORM FIELDS ────────────────────────────────────────────── */
-/* Used in: Products modal */
 .admin-shell .form-field {
   display: flex;
   flex-direction: column;
@@ -969,7 +996,6 @@
    PRODUCTS PAGE — .admin-shell.prod-page
    ============================================================ */
 
-/* ── ADD BUTTON ─────────────────────────────────────────────── */
 .admin-shell .prod-add-btn {
   padding: 0 20px;
   width: auto;
@@ -977,18 +1003,15 @@
   flex-shrink: 0;
 }
 
-/* ── TABLE WRAPPER — horizontal scroll on mobile ────────────── */
 .admin-shell .prod-table-wrap {
   width: 100%;
   overflow-x: auto;
 }
 
-/* min-width stops columns from collapsing on narrow viewports */
 .admin-shell .prod-table {
   min-width: 520px;
 }
 
-/* ── ROW HOVER ──────────────────────────────────────────────── */
 .admin-shell .prod-row {
   transition: background 0.1s ease;
 }
@@ -997,7 +1020,6 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
-/* ── NAME CELL ──────────────────────────────────────────────── */
 .admin-shell .prod-name-cell {
   min-width: 180px;
 }
@@ -1037,21 +1059,17 @@
   margin-top: 2px;
 }
 
-/* ── DESCRIPTION CELL ───────────────────────────────────────── */
 .admin-shell .prod-desc-cell {
   max-width: 300px;
   color: var(--text-muted);
   font-size: 0.85rem;
   display: -webkit-box;
-  -webkit-box-orient: vertical; /* stylelint-disable-line */
+  -webkit-box-orient: vertical;
   line-clamp: 2;
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
 
-/* ── ACTIONS CELL ───────────────────────────────────────────── */
-/* width:1% + white-space:nowrap forces the cell to shrink-wrap
-   its content — browser can NEVER squish or clip the buttons  */
 .admin-shell .prod-actions-th {
   text-align: right;
 }
@@ -1085,7 +1103,6 @@
   border-color: rgba(248, 113, 113, 0.3);
 }
 
-/* ── MODAL SHARED ───────────────────────────────────────────── */
 .admin-shell .prod-modal-title {
   font-size: 1.4rem;
   margin-bottom: 1.5rem;
@@ -1141,12 +1158,10 @@
   flex: unset;
 }
 
-/* ── VARIANTS MODAL ─────────────────────────────────────────── */
 .admin-shell .prod-variants-modal {
   max-width: 640px;
 }
 
-/* Scrollable variant list */
 .admin-shell .prod-variants-list {
   display: flex;
   flex-direction: column;
@@ -1156,7 +1171,6 @@
   padding-right: 4px;
 }
 
-/* ── VARIANT CARD ───────────────────────────────────────────── */
 .admin-shell .prod-variant-card {
   display: flex;
   align-items: flex-start;
@@ -1172,7 +1186,6 @@
   border-color: rgba(99, 102, 241, 0.25);
 }
 
-/* ── IMAGE SLOT ─────────────────────────────────────────────── */
 .admin-shell .prod-variant-img-slot {
   display: flex;
   flex-direction: column;
@@ -1210,13 +1223,11 @@
   text-align: center;
 }
 
-/* Higher specificity to override .stock-btn defaults without !important */
 .admin-shell .prod-variant-img-actions .prod-img-btn {
   font-size: 0.65rem;
   padding: 4px 6px;
 }
 
-/* ── VARIANT BODY ───────────────────────────────────────────── */
 .admin-shell .prod-variant-body {
   flex: 1;
   display: flex;
@@ -1253,7 +1264,6 @@
   font-weight: 500;
 }
 
-/* ── STOCK CONTROL inside variant card ──────────────────────── */
 .admin-shell .prod-stock-control {
   gap: 10px;
 }
@@ -1271,9 +1281,6 @@
   font-size: 1rem;
 }
 
-/* ── RESPONSIVE — PRODUCTS ──────────────────────────────────── */
-
-/* Hide description on small phones — buttons always stay visible */
 @media (max-width: 600px) {
   .admin-shell .prod-desc-th,
   .admin-shell .prod-desc-cell {
@@ -1281,7 +1288,6 @@
   }
 }
 
-/* Stack variant card vertically on very small screens */
 @media (max-width: 480px) {
   .admin-shell .prod-variant-card {
     flex-direction: column;
@@ -1305,13 +1311,12 @@
     flex: 1;
   }
 }
-/* ── CREATE/EDIT MODAL EXTRAS ───────────────────────────────── */
+
 .admin-shell .prod-create-modal {
   max-width: 680px;
   max-height: 92vh;
 }
 
-/* Section labels inside modal */
 .admin-shell .prod-modal-section-label {
   font-size: 0.72rem;
   font-weight: 700;
@@ -1337,7 +1342,6 @@
   opacity: 0.7;
 }
 
-/* ── PRODUCT IMAGE UPLOAD ROW ───────────────────────────────── */
 .admin-shell .prod-img-upload-row {
   display: flex;
   align-items: center;
@@ -1361,7 +1365,6 @@
   font-size: 1.4rem;
 }
 
-/* ── VARIANT FORM CARDS ─────────────────────────────────────── */
 .admin-shell .prod-variants-form-list {
   display: flex;
   flex-direction: column;
@@ -1369,7 +1372,6 @@
   margin-bottom: 10px;
 }
 
-/* One card per variant */
 .admin-shell .prod-variant-form-card {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
@@ -1380,7 +1382,6 @@
   gap: 10px;
 }
 
-/* Card top bar: "Variant N" label + Remove button */
 .admin-shell .prod-variant-form-card-header {
   display: flex;
   align-items: center;
@@ -1395,7 +1396,6 @@
   letter-spacing: 0.05em;
 }
 
-/* 2×2 grid: Size | Color / Price | Stock */
 .admin-shell .prod-variant-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1439,7 +1439,6 @@
   opacity: 0.5;
 }
 
-/* Remove button — small, right-aligned */
 .admin-shell .prod-variant-remove {
   font-size: 0.72rem;
   padding: 4px 10px;
@@ -1450,7 +1449,6 @@
   cursor: not-allowed;
 }
 
-/* Add variant button */
 .admin-shell .prod-variant-add-btn {
   margin-bottom: 1.5rem;
   border-style: dashed;
@@ -1465,9 +1463,6 @@
   background: rgba(99, 102, 241, 0.06);
 }
 
-/* ── VARIANT IMAGE SLOTS (create modal + viewer) ────────────── */
-
-/* Row of image thumbnails inside a variant card */
 .admin-shell .prod-variant-img-row,
 .admin-shell .prod-variant-viewer-imgs {
   display: flex;
@@ -1476,7 +1471,6 @@
   margin-top: 8px;
 }
 
-/* Individual thumbnail slot */
 .admin-shell .prod-variant-img-slot-sm {
   position: relative;
   width: 70px;
@@ -1493,7 +1487,6 @@
   display: block;
 }
 
-/* Remove button overlaid on thumbnail */
 .admin-shell .prod-variant-img-remove {
   position: absolute;
   top: -6px;
@@ -1519,7 +1512,6 @@
   transform: scale(1.15);
 }
 
-/* "Add Photo" dashed button — same size as thumbnail */
 .admin-shell .prod-variant-img-add {
   width: 70px;
   height: 70px;
@@ -1563,7 +1555,6 @@
   letter-spacing: 0.03em;
 }
 
-/* Save status message */
 .admin-shell .prod-save-status {
   font-size: 0.82rem;
   color: var(--accent);
@@ -1581,7 +1572,6 @@
   }
 }
 
-/* Viewer modal — variant card layout update (info on top, images below) */
 .admin-shell .prod-variants-modal .prod-variant-card {
   flex-direction: column;
   gap: 10px;
@@ -1592,4 +1582,389 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+}
+
+/* ============================================================
+   ORDERS PAGE — .admin-shell.ord-page
+   ============================================================ */
+
+/* ── TABLE WRAPPER — IMPROVED HORIZONTAL SCROLL ────────────── */
+.admin-shell .ord-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-shell .ord-table {
+  min-width: 900px;
+  width: 100%;
+}
+
+/* Ensure the card container allows overflow */
+.admin-shell .ord-table-card {
+  overflow: visible;
+  border-radius: 16px;
+}
+
+.admin-shell .ord-table-card .ord-table-wrap {
+  border-radius: 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* ── SELECTED ROW ───────────────────────────────────────────── */
+.admin-shell .ord-row-selected {
+  background: rgba(99, 102, 241, 0.07) !important;
+  border-left: 2px solid var(--accent);
+}
+
+/* ── REFERENCE TEXT ─────────────────────────────────────────── */
+.admin-shell .ord-ref-text {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-family: "DM Mono", monospace;
+  margin-top: 2px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── PAYMENT BADGE ──────────────────────────────────────────── */
+.admin-shell .ord-pay-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.admin-shell .ord-pay-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── RESPONSIVE COLUMN HIDING ───────────────────────────────── */
+@media (max-width: 640px) {
+  .admin-shell .ord-th-hide-sm,
+  .admin-shell .ord-td-hide-sm {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-shell .ord-th-hide-md,
+  .admin-shell .ord-td-hide-md {
+    display: none;
+  }
+}
+
+/* ── DRAWER OVERLAY ─────────────────────────────────────────── */
+.admin-shell .ord-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  --bg-card: #1e293b;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --success: #4ade80;
+  --warning: #fde047;
+}
+
+/* ── DRAWER PANEL ───────────────────────────────────────────── */
+.admin-shell .ord-drawer {
+  background: var(--bg-card);
+  width: 520px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  animation: drawerFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes drawerFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ── DRAWER HEADER ──────────────────────────────────────────── */
+.admin-shell .ord-drawer-header {
+  padding: 1.2rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 1;
+}
+
+.admin-shell .ord-drawer-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.admin-shell .ord-drawer-ref {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-family: "DM Mono", monospace;
+  margin-top: 2px;
+}
+
+.admin-shell .ord-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.admin-shell .ord-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+/* ── DRAWER BODY ────────────────────────────────────────────── */
+.admin-shell .ord-drawer-body {
+  padding: 1.2rem 1.4rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding-bottom: 2rem;
+}
+
+/* ── STATUS ROW ─────────────────────────────────────────────── */
+.admin-shell .ord-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── SECTION LABEL ──────────────────────────────────────────── */
+.admin-shell .ord-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.6rem;
+}
+
+/* ── INFO BLOCK ─────────────────────────────────────────────── */
+.admin-shell .ord-info-block {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+}
+
+.admin-shell .ord-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.admin-shell .ord-info-lbl {
+  font-size: 0.63rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+
+.admin-shell .ord-info-val {
+  font-size: 0.82rem;
+  color: var(--text);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.admin-shell .ord-info-accent {
+  color: #a5b4fc;
+}
+
+/* ── ITEMS LIST ─────────────────────────────────────────────── */
+.admin-shell .ord-items-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-shell .ord-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 12px;
+}
+
+.admin-shell .ord-item-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.admin-shell .ord-item-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.admin-shell .ord-item-variant {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.admin-shell .ord-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.admin-shell .ord-item-qty {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.admin-shell .ord-item-price {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* ── TOTALS ─────────────────────────────────────────────────── */
+.admin-shell .ord-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-shell .ord-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.admin-shell .ord-total-lbl {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.admin-shell .ord-total-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.admin-shell .ord-total-surcharge .ord-total-lbl,
+.admin-shell .ord-total-surcharge .ord-total-val {
+  color: #f59e0b;
+}
+
+.admin-shell .ord-total-grand {
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+.admin-shell .ord-total-grand .ord-total-lbl {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.admin-shell .ord-total-grand .ord-total-val {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.admin-shell .ord-free-ship-banner {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  color: var(--success);
+  margin: 2px 0 4px;
+}
+
+/* ── STATUS BUTTONS ─────────────────────────────────────────── */
+.admin-shell .ord-status-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ── WOMPI ID ───────────────────────────────────────────────── */
+.admin-shell .ord-wompi-id {
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 8px;
+  word-break: break-all;
+}
+
+/* ── MOBILE RESPONSIVE — DRAWER ─────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-shell .ord-drawer {
+    width: 92vw;
+    max-width: 92vw;
+    max-height: 85vh;
+    border-radius: 16px;
+  }
+
+  .admin-shell .ord-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .admin-shell .ord-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-shell .ord-drawer-body {
+    padding: 1rem;
+  }
 }

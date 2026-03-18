@@ -146,18 +146,51 @@ class OrderService {
   static async updateOrderStatus(orderId, newStatus) {
     const order = await Order.findByPk(orderId);
     if (!order) throw Boom.notFound("Order not found");
-    const allowedTransitions = {
-      pending: ["processing", "cancelled"],
-      processing: ["shipped", "cancelled"],
-      shipped: ["delivered"],
-      delivered: [],
-      cancelled: [],
-    };
-    if (!allowedTransitions[order.status].includes(newStatus)) {
+
+    // Define allowed statuses
+    const ALLOWED_STATUSES = [
+      "pending",
+      "paid",
+      "shipped",
+      "completed",
+      "cancelled",
+    ];
+
+    // Validate that the new status is valid
+    if (!ALLOWED_STATUSES.includes(newStatus)) {
       throw Boom.badRequest(
-        `Cannot change order status from '${order.status}' to '${newStatus}'`
+        `Invalid status '${newStatus}'. Allowed statuses: ${ALLOWED_STATUSES.join(", ")}`
       );
     }
+
+    // Define allowed transitions
+    const allowedTransitions = {
+      pending: ["paid", "cancelled"],
+      paid: ["shipped", "cancelled"],
+      shipped: ["completed", "cancelled"],
+      completed: [], // Cannot change from completed
+      cancelled: [], // Cannot change from cancelled
+    };
+
+    // Check if current status exists in transitions map
+    if (!allowedTransitions[order.status]) {
+      // If current status is not in the map, allow any valid status change
+      // This handles legacy orders or edge cases
+      console.warn(
+        `Unknown order status '${order.status}', allowing transition to '${newStatus}'`
+      );
+      order.status = newStatus;
+      await order.save();
+      return order;
+    }
+
+    // Check if transition is allowed
+    if (!allowedTransitions[order.status].includes(newStatus)) {
+      throw Boom.badRequest(
+        `Cannot change order status from '${order.status}' to '${newStatus}'. Allowed transitions: ${allowedTransitions[order.status].join(", ") || "none"}`
+      );
+    }
+
     order.status = newStatus;
     await order.save();
     return order;

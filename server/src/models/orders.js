@@ -19,7 +19,7 @@ Order.init(
     customerName: {
       type: DataTypes.STRING,
       allowNull: false,
-    },  
+    },
 
     customerEmail: {
       type: DataTypes.STRING,
@@ -52,8 +52,6 @@ Order.init(
       defaultValue: 0,
     },
 
-   
-
     subtotal: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
@@ -71,25 +69,26 @@ Order.init(
       defaultValue: 0,
     },
 
-     status: {
+    status: {
       type: DataTypes.ENUM(
-        "pending", 
+        "pending",
         "paid",
         "shipped",
-        "completed", 
+        "completed",
         "cancelled"
-    ),
+      ),
       defaultValue: "pending",
     },
 
     paymentMethod: {
-      type: DataTypes.ENUM(
-        "wompi", 
-        "nequi", 
-        "daviplata", 
-        "bank_transfer"
-      ),
+      type: DataTypes.ENUM("wompi", "nequi", "daviplata", "bank_transfer"),
       allowNull: false,
+    },
+
+    creditCardSurcharge: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0,
     },
 
     reference: {
@@ -103,16 +102,9 @@ Order.init(
     },
 
     paymentStatus: {
-      type: DataTypes.ENUM(
-        "unpaid", 
-        "paid", 
-        "refunded",
-        "failed",
-        "pending"
-    ),
-    defaultValue: "unpaid",
+      type: DataTypes.ENUM("unpaid", "paid", "refunded", "failed", "pending"),
+      defaultValue: "unpaid",
     },
-
   },
   {
     sequelize,
