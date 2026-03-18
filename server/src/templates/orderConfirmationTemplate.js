@@ -149,7 +149,7 @@ export const orderConfirmationTemplate = (
                   hasCreditCardSurcharge
                     ? `
                 <tr>
-                  <td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Recargo tarjeta de crédito (5%)</td>
+                  <td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Recargo por pago con tarjeta de crédito (5%)</td>
                   <td style="padding: 6px 0; text-align: right; color: #b45309; font-size: 14px; font-weight: 600;">${formatCOP(order.creditCardSurcharge)}</td>
                 </tr>`
                     : ""

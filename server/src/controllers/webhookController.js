@@ -2,6 +2,9 @@ import crypto from "crypto";
 import { Order, Order_items } from "../models/index.js";
 import { sendPostPaymentEmails } from "../services/emailService.js";
 
+const SURCHARGE_RATE = 0.05;
+
+// ── WOMPI SIGNATURE VERIFICATION ────────────────────────────────────────────
 const verifyWompiWebhook = (event) => {
   try {
     const secret = process.env.WOMPI_EVENTS_SECRET;
@@ -23,16 +26,10 @@ const verifyWompiWebhook = (event) => {
     concatenated += String(timestamp);
     concatenated += secret;
 
-    console.log("String a hashear:", concatenated);
-
     const computedChecksum = crypto
       .createHash("sha256")
       .update(concatenated)
       .digest("hex");
-
-    console.log("Checksum esperado: ", checksum);
-    console.log("Checksum calculado:", computedChecksum);
-    console.log("Match:", computedChecksum === checksum);
 
     return computedChecksum === checksum;
   } catch (error) {
@@ -41,22 +38,23 @@ const verifyWompiWebhook = (event) => {
   }
 };
 
+// ── MAIN WEBHOOK HANDLER ─────────────────────────────────────────────────────
 export const handleWompiWebhook = async (req, res) => {
   try {
     const event = req.body;
 
-    // 1. Verificar que la solicitud viene realmente de Wompi
+    // 1. Verify the request genuinely comes from Wompi
     if (!verifyWompiWebhook(event)) {
       console.warn("Webhook rechazado — firma invalida");
       return res.status(401).json({ message: "Firma invalida" });
     }
 
-    // 2. Responder 200 a Wompi INMEDIATAMENTE (evita re-intentos)
+    // 2. Respond 200 to Wompi IMMEDIATELY (prevents retries)
     res.status(200).json({ received: true });
 
-    // 3. Validar que sea un evento de transaccion
+    // 3. Only handle transaction events
     if (event?.event !== "transaction.updated") {
-      console.log(`Evento Wompi ignorado: ${event?.event}`);
+      console.log(`Evento ignorado: ${event?.event}`);
       return;
     }
 
@@ -66,16 +64,20 @@ export const handleWompiWebhook = async (req, res) => {
       return;
     }
 
-    // 4. Solo procesar transacciones APROBADAS
+    // 4. Only process APPROVED transactions
     if (transaction.status !== "APPROVED") {
-      console.log(`Transaccion ${transaction.id} con estado: ${transaction.status} — sin accion`);
+      console.log(
+        `Transaccion ${transaction.id} — estado: ${transaction.status} — sin accion`
+      );
       return;
     }
 
     const reference = transaction.reference;
-    console.log(`Pago aprobado — Referencia: ${reference} | ID Wompi: ${transaction.id}`);
+    console.log(
+      `Pago aprobado — Referencia: ${reference} | ID Wompi: ${transaction.id}`
+    );
 
-    // 5. Buscar la orden en la DB por referencia
+    // 5. Find the order in DB by reference
     const order = await Order.findOne({ where: { reference } });
 
     if (!order) {
@@ -83,23 +85,67 @@ export const handleWompiWebhook = async (req, res) => {
       return;
     }
 
-    // 6. Evitar procesar el mismo pago dos veces
+    // 6. Prevent processing the same payment twice
     if (order.paymentStatus === "paid") {
-      console.log(`Orden #${reference} ya fue procesada — ignorando duplicado`);
+      console.log(`Orden #${reference} ya procesada — ignorando duplicado`);
       return;
     }
 
-    // 7. Actualizar la orden en la DB
+    // 7. ── SURCHARGE LOGIC ──────────────────────────────────────────────────
+    const wompiPaymentType = transaction.payment_method_type; // "CARD", "PSE", etc.
+    const isCardPayment = wompiPaymentType === "CARD";
+
+    const subtotal = parseFloat(order.subtotal);
+    const shippingCost = parseFloat(order.shippingCost) || 0;
+    const existingSurcharge = parseFloat(order.creditCardSurcharge) || 0;
+
+    let creditCardSurcharge = existingSurcharge;
+    let totalAmount = parseFloat(order.totalAmount);
+
+    if (isCardPayment && existingSurcharge === 0) {
+      // Customer paid with CC via Wompi but did NOT tick CC on the form
+      // → surcharge was never applied, apply it now retroactively
+      creditCardSurcharge = parseFloat(
+        (
+          Math.round((subtotal + shippingCost) * SURCHARGE_RATE * 100) / 100
+        ).toFixed(2)
+      );
+      totalAmount = parseFloat(
+        (subtotal + shippingCost + creditCardSurcharge).toFixed(2)
+      );
+      console.log(
+        `⚠️  Recargo CC aplicado retroactivamente — Orden #${reference}: +$${creditCardSurcharge}`
+      );
+    } else if (isCardPayment && existingSurcharge > 0) {
+      // Surcharge already applied via the form — do NOT double charge
+      console.log(
+        `✅ Recargo CC ya aplicado en formulario — Orden #${reference} — sin cambio`
+      );
+    } else {
+      // Not a card payment — ensure surcharge is zero
+      creditCardSurcharge = 0;
+      totalAmount = parseFloat((subtotal + shippingCost).toFixed(2));
+      console.log(`Pago sin tarjeta — Orden #${reference} — sin recargo`);
+    }
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // 8. Update the order in DB
     await order.update({
       paymentStatus: "paid",
       status: "paid",
       wompiTransactionId: transaction.id,
-      paymentMethod: mapPaymentMethod(transaction.payment_method_type),
+      paymentMethod: isCardPayment
+        ? "credit_card"
+        : mapPaymentMethod(wompiPaymentType),
+      creditCardSurcharge,
+      totalAmount,
     });
 
-    console.log(`Orden #${reference} actualizada a "paid"`);
+    console.log(
+      `Orden #${reference} → paid | Método: ${wompiPaymentType} | Recargo: $${creditCardSurcharge} | Total: $${totalAmount}`
+    );
 
-    // 8. Obtener los items con nombre del producto
+    // 9. Fetch items with product name for email
     const orderItems = await Order_items.findAll({
       where: { orderId: order.id },
       include: [
@@ -110,32 +156,33 @@ export const handleWompiWebhook = async (req, res) => {
       ],
     });
 
-    // 9. Formatear items para las plantillas de email
+    // 10. Format items for email templates
     const formattedItems = orderItems.map((item) => ({
       productName: item.productVariant?.product?.name || "Producto",
       variantInfo: item.productVariant
-        ? `${item.productVariant.color || ""} ${item.productVariant.size || ""}`.trim()
+        ? `${item.productVariant.color || ""} ${
+            item.productVariant.size || ""
+          }`.trim()
         : null,
       quantity: item.quantity,
       priceAtPurchase: parseFloat(item.priceAtPurchase),
     }));
 
-    // 10. Enviar ambos emails en paralelo
+    // 11. Send both emails in parallel
     const emailResults = await sendPostPaymentEmails(order, formattedItems);
 
-    console.log("Resultado emails:", {
-      cliente: emailResults.customerEmail.success ? "Enviado" : "Fallo",
-      admin: emailResults.adminEmail.success ? "Enviado" : "Fallo",
+    console.log("Emails:", {
+      cliente: emailResults.customerEmail.success ? "✅ Enviado" : "❌ Fallo",
+      admin: emailResults.adminEmail.success ? "✅ Enviado" : "❌ Fallo",
     });
-
   } catch (error) {
     console.error("Error en webhook de Wompi:", error);
   }
 };
 
+// ── PAYMENT METHOD MAPPER ────────────────────────────────────────────────────
 const mapPaymentMethod = (wompiMethod) => {
   const map = {
-    CARD: "wompi",
     NEQUI: "nequi",
     PSE: "bank_transfer",
     BANCOLOMBIA_TRANSFER: "bank_transfer",

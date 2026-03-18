@@ -8,11 +8,37 @@ const authHeaders = () => ({
 });
 
 const handleResponse = async (res) => {
+  // Check content type
+  const contentType = res.headers.get("content-type");
+  const isJson = contentType && contentType.includes("application/json");
+
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(err.message || "Request failed");
+    // Try to parse error as JSON, fallback to text
+    let errorMessage = `Server error: ${res.status} ${res.statusText}`;
+
+    try {
+      if (isJson) {
+        const err = await res.json();
+        errorMessage = err.message || err.error || errorMessage;
+      } else {
+        const text = await res.text();
+        console.error("Server returned non-JSON error:", text);
+        errorMessage = `Server error (${res.status}). Check console for details.`;
+      }
+    } catch (parseError) {
+      console.error("Failed to parse error response:", parseError);
+    }
+
+    throw new Error(errorMessage);
   }
-  return res.json();
+
+  // Success response
+  if (isJson) {
+    return res.json();
+  }
+
+  // Non-JSON success response (shouldn't happen, but handle it)
+  return res.text();
 };
 
 // ── Auth ──────────────────────────────────────────────────────
