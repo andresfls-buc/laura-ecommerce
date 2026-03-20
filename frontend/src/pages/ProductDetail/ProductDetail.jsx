@@ -9,13 +9,15 @@ import { FiCheckCircle, FiAlertTriangle, FiXCircle } from "react-icons/fi";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { addToCart } = useCart();
+  const { addToCart, cart } = useCart();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [toast, setToast] = useState(null); // Toast notification state
+  const [addingToCart, setAddingToCart] = useState(false); // Button loading state
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -42,6 +44,18 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
+  // Auto-dismiss toast after 3 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
+
   const handleVariantChange = (variant) => {
     setSelectedVariant(variant);
     setSelectedImage(variant.images?.[0]?.imageUrl || product.image);
@@ -51,10 +65,13 @@ const ProductDetail = () => {
   const isOutOfStock = currentStock === 0;
 
   const handleAddToCart = () => {
+    // Validate variant selection
     if (product.variants?.length > 0 && !selectedVariant) {
-      alert("Por favor selecciona una variante");
+      showToast("Por favor selecciona una variante", "warning");
       return;
     }
+
+    setAddingToCart(true);
 
     const wasAdded = addToCart({
       id: product.id,
@@ -68,27 +85,18 @@ const ProductDetail = () => {
       stock: currentStock,
     });
 
-    if (wasAdded) {
-      alert("Producto agregado al carrito");
-    }
+    setTimeout(() => {
+      setAddingToCart(false);
+      if (wasAdded) {
+        showToast("✓ Producto agregado al carrito", "success");
+      } else {
+        showToast("No hay suficiente stock disponible", "error");
+      }
+    }, 300);
   };
 
   const handleIrAPagar = () => {
-    if (product.variants?.length > 0 && !selectedVariant) {
-      alert("Por favor selecciona una variante");
-      return;
-    }
-    addToCart({
-      id: product.id,
-      productVariantId: selectedVariant?.id || product.id,
-      name: product.name,
-      price: selectedVariant ? selectedVariant.price : product.price,
-      image: selectedImage,
-      quantity: 1,
-      color: selectedVariant?.color,
-      size: selectedVariant?.size,
-      stock: currentStock,
-    });
+    // Navigate directly to cart (don't add again)
     navigate("/cart");
   };
 
@@ -97,6 +105,18 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`toast toast-${toast.type}`}>
+          <div className="toast-content">
+            {toast.type === "success" && <FiCheckCircle />}
+            {toast.type === "warning" && <FiAlertTriangle />}
+            {toast.type === "error" && <FiXCircle />}
+            <span>{toast.message}</span>
+          </div>
+        </div>
+      )}
+
       <div className="product-detail-container">
         {/* LEFT SIDE: Images */}
         <div className="gallery">
@@ -171,11 +191,12 @@ const ProductDetail = () => {
           {/* Action buttons */}
           <div className="action-buttons">
             <button
-              className="add-to-cart-btn"
+              className={`add-to-cart-btn ${addingToCart ? "adding" : ""}`}
               onClick={handleAddToCart}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || addingToCart}
             >
-              <BsCartPlus size={20} /> Agregar al carrito
+              <BsCartPlus size={20} />
+              {addingToCart ? "Agregando..." : "Agregar al carrito"}
             </button>
 
             <button
