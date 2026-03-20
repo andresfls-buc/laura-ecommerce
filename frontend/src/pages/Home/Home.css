@@ -37,6 +37,8 @@
 .products-section {
   padding: 40px 16px;
   text-align: center;
+  max-width: 1400px; /* Limit maximum width */
+  margin: 0 auto; /* Center the section */
 }
 
 .section-title {
@@ -44,24 +46,45 @@
   margin-bottom: 20px;
 }
 
-/* 2 columns on mobile, 3 on tablet, 4 on desktop */
+/* Responsive grid with better spacing and max card width */
 .products-grid {
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  max-width: 100%;
+  margin: 0 auto;
 }
 
-@media (min-width: 640px) {
+/* Mobile: 2 columns */
+@media (max-width: 639px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* Tablet: 3 columns */
+@media (min-width: 640px) and (max-width: 1023px) {
   .products-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
 }
 
+/* Desktop: 4 columns with max width constraint */
 @media (min-width: 1024px) {
   .products-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(200px, 280px));
     gap: 20px;
+    justify-content: center;
+  }
+}
+
+/* Large screens: prevent cards from getting too big */
+@media (min-width: 1440px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 280px);
+    gap: 24px;
   }
 }
 
