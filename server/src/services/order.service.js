@@ -1,6 +1,12 @@
 import sequelize from "../config/sequelize.js";
 import Boom from "@hapi/boom";
-import { User, Order, Order_items, ProductVariant } from "../models/index.js";
+import {
+  User,
+  Order,
+  Order_items,
+  ProductVariant,
+  Product,
+} from "../models/index.js";
 import { SHIPPING_COST } from "../config/constants.js";
 
 class OrderService {
@@ -122,7 +128,19 @@ class OrderService {
         {
           model: Order_items,
           as: "items",
-          include: [{ model: ProductVariant, as: "productVariant" }],
+          include: [
+            {
+              model: ProductVariant,
+              as: "productVariant",
+              include: [
+                {
+                  model: Product,
+                  as: "product",
+                  attributes: ["id", "name", "description"],
+                },
+              ],
+            },
+          ],
         },
       ],
       order: [["createdAt", "DESC"]],
@@ -135,7 +153,19 @@ class OrderService {
         {
           model: Order_items,
           as: "items",
-          include: [{ model: ProductVariant, as: "productVariant" }],
+          include: [
+            {
+              model: ProductVariant,
+              as: "productVariant",
+              include: [
+                {
+                  model: Product,
+                  as: "product",
+                  attributes: ["id", "name", "description"],
+                },
+              ],
+            },
+          ],
         },
       ],
     });
@@ -144,56 +174,85 @@ class OrderService {
   }
 
   static async updateOrderStatus(orderId, newStatus) {
-    const order = await Order.findByPk(orderId);
-    if (!order) throw Boom.notFound("Order not found");
+    const transaction = await sequelize.transaction();
 
-    // Define allowed statuses
-    const ALLOWED_STATUSES = [
-      "pending",
-      "paid",
-      "shipped",
-      "completed",
-      "cancelled",
-    ];
+    try {
+      const order = await Order.findByPk(orderId, {
+        include: [{ model: Order_items, as: "items" }],
+        transaction,
+      });
+      if (!order) throw Boom.notFound("Order not found");
 
-    // Validate that the new status is valid
-    if (!ALLOWED_STATUSES.includes(newStatus)) {
-      throw Boom.badRequest(
-        `Invalid status '${newStatus}'. Allowed statuses: ${ALLOWED_STATUSES.join(", ")}`
-      );
-    }
+      // Define allowed statuses
+      const ALLOWED_STATUSES = [
+        "pending",
+        "paid",
+        "shipped",
+        "completed",
+        "cancelled",
+      ];
 
-    // Define allowed transitions
-    const allowedTransitions = {
-      pending: ["paid", "cancelled"],
-      paid: ["shipped", "cancelled"],
-      shipped: ["completed", "cancelled"],
-      completed: [], // Cannot change from completed
-      cancelled: [], // Cannot change from cancelled
-    };
+      // Validate that the new status is valid
+      if (!ALLOWED_STATUSES.includes(newStatus)) {
+        throw Boom.badRequest(
+          `Invalid status '${newStatus}'. Allowed statuses: ${ALLOWED_STATUSES.join(", ")}`
+        );
+      }
 
-    // Check if current status exists in transitions map
-    if (!allowedTransitions[order.status]) {
-      // If current status is not in the map, allow any valid status change
-      // This handles legacy orders or edge cases
-      console.warn(
-        `Unknown order status '${order.status}', allowing transition to '${newStatus}'`
-      );
+      // Define allowed transitions
+      const allowedTransitions = {
+        pending: ["paid", "cancelled"],
+        paid: ["shipped", "cancelled"],
+        shipped: ["completed", "cancelled"],
+        completed: [], // Cannot change from completed
+        cancelled: [], // Cannot change from cancelled
+      };
+
+      // Check if current status exists in transitions map
+      if (!allowedTransitions[order.status]) {
+        // If current status is not in the map, allow any valid status change
+        // This handles legacy orders or edge cases
+        console.warn(
+          `Unknown order status '${order.status}', allowing transition to '${newStatus}'`
+        );
+        order.status = newStatus;
+        await order.save({ transaction });
+        await transaction.commit();
+        return order;
+      }
+
+      // Check if transition is allowed
+      if (!allowedTransitions[order.status].includes(newStatus)) {
+        throw Boom.badRequest(
+          `Cannot change order status from '${order.status}' to '${newStatus}'. Allowed transitions: ${allowedTransitions[order.status].join(", ") || "none"}`
+        );
+      }
+
+      // ── RESTORE STOCK IF CHANGING TO CANCELLED ────────────────────────────
+      if (newStatus === "cancelled" && order.status !== "cancelled") {
+        for (const item of order.items) {
+          const variant = await ProductVariant.findByPk(item.productVariantId, {
+            transaction,
+          });
+          if (variant) {
+            const previousStock = variant.stock;
+            variant.stock += item.quantity;
+            await variant.save({ transaction });
+            console.log(
+              `📦 Stock restaurado (cancelación manual) — Variante ID ${variant.id}: ${previousStock} → ${variant.stock} (+${item.quantity})`
+            );
+          }
+        }
+      }
+
       order.status = newStatus;
-      await order.save();
+      await order.save({ transaction });
+      await transaction.commit();
       return order;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
     }
-
-    // Check if transition is allowed
-    if (!allowedTransitions[order.status].includes(newStatus)) {
-      throw Boom.badRequest(
-        `Cannot change order status from '${order.status}' to '${newStatus}'. Allowed transitions: ${allowedTransitions[order.status].join(", ") || "none"}`
-      );
-    }
-
-    order.status = newStatus;
-    await order.save();
-    return order;
   }
 
   static async cancelOrder(orderId) {
