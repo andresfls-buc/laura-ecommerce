@@ -15,13 +15,23 @@ const Home = () => {
   const { products, loading } = useProducts();
 
   // Pick the first 3 products for the collections section
-  // You can replace this with specific product IDs later if needed
   const collectionProducts = products.slice(0, 3);
+
+  // Get a featured product image for the banner background
+  // You can change this to use a specific product or a static image
+  const bannerImage =
+    products.length > 0 ? getProductImage(products[0]) : "/banner-default.jpg"; // Fallback image
 
   return (
     <div className="home-container">
-      {/* Banner principal */}
+      {/* Banner principal con imagen de fondo */}
       <section className="banner-section">
+        <div
+          className="banner-background"
+          style={{
+            backgroundImage: `url(${bannerImage})`,
+          }}
+        />
         <div className="banner-content">
           <h1 className="banner-title">Descubre la nueva colección</h1>
           <p className="banner-subtitle">Viste con estilo cada día</p>

@@ -1,10 +1,14 @@
+/* Navbar.css - Minimal Zara-Inspired Grey Theme */
+
 .navbar {
-  background-color: #111;
-  color: white;
+  background-color: #ffffff;
+  color: #1a1a1a;
   padding: 15px 20px;
   position: sticky;
   top: 0;
   z-index: 1000;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .navbar-container {
@@ -20,7 +24,7 @@
   width: auto;
   object-fit: contain;
   display: block;
-  filter: brightness(0) invert(1);
+  filter: none;
 }
 
 /* Links */
@@ -36,21 +40,38 @@
   display: block;
   padding: 8px 12px;
   text-decoration: none;
-  color: white; /* Force white color */
-  font-weight: 500;
-  font-size: 16px;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-size: 15px;
   transition: all 0.3s ease;
+  position: relative;
+  letter-spacing: 0.02em;
+}
+
+.navbar-links a::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 12px;
+  width: 0;
+  height: 1px;
+  background: #1a1a1a;
+  transition: width 0.3s ease;
 }
 
 .navbar-links a:hover {
-  color: #fff;
-  background-color: #e91e63;
+  color: #1a1a1a;
+  background-color: transparent;
 }
 
-/* Prevent visited links from turning purple */
-.navbar-links a:visited, 
+.navbar-links a:hover::after {
+  width: calc(100% - 24px);
+}
+
+/* Prevent visited links from changing color */
+.navbar-links a:visited,
 .cart-icon-wrapper:visited {
-  color: white;
+  color: #1a1a1a;
 }
 
 /* 🛒 Cart Section Specifics */
@@ -61,25 +82,28 @@
 }
 
 .cart-icon-wrapper {
-  position: relative; /* Context for the badge */
+  position: relative;
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: white; /* ✅ Fix: Ensures the icon isn't blue/purple */
+  color: #1a1a1a;
   font-size: 24px;
   transition: 0.3s;
+  padding: 8px 12px;
+  border-radius: 0;
 }
 
 .cart-icon-wrapper:hover {
-  color: #e91e63; /* Turns pink on hover like your links */
+  color: #4a4a4a;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 /* 🔴 The Badge */
 .cart-badge {
   position: absolute;
-  top: -8px;
-  right: -10px;
-  background-color: #e91e63; /* Matches your pink theme */
+  top: -2px;
+  right: -2px;
+  background: #2c2c2c;
   color: white;
   font-size: 11px;
   font-weight: bold;
@@ -89,7 +113,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #111; /* Matches navbar background to look "cut out" */
+  border: 2px solid #ffffff;
   padding: 2px;
 }
 
@@ -104,20 +128,34 @@
 
 .navbar-toggle span {
   position: absolute;
-  height: 3px;
+  height: 2px;
   width: 100%;
-  background: white;
-  border-radius: 2px;
+  background: #1a1a1a;
+  border-radius: 0;
   transition: all 0.3s ease;
 }
 
-.navbar-toggle span:nth-child(1) { top: 0; }
-.navbar-toggle span:nth-child(2) { top: 9px; }
-.navbar-toggle span:nth-child(3) { bottom: 0; }
+.navbar-toggle span:nth-child(1) {
+  top: 0;
+}
+.navbar-toggle span:nth-child(2) {
+  top: 9px;
+}
+.navbar-toggle span:nth-child(3) {
+  bottom: 0;
+}
 
-.navbar-toggle.open span:nth-child(1) { transform: rotate(45deg); top: 9px; }
-.navbar-toggle.open span:nth-child(2) { opacity: 0; }
-.navbar-toggle.open span:nth-child(3) { transform: rotate(-45deg); bottom: 10px; }
+.navbar-toggle.open span:nth-child(1) {
+  transform: rotate(45deg);
+  top: 9px;
+}
+.navbar-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.navbar-toggle.open span:nth-child(3) {
+  transform: rotate(-45deg);
+  bottom: 10px;
+}
 
 /* 📱 Mobile Styles */
 @media (max-width: 768px) {
@@ -126,12 +164,14 @@
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: #111;
+    background-color: #ffffff;
     flex-direction: column;
     align-items: center;
     gap: 20px;
     padding: 20px 0;
     display: none;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
   .navbar-links.active {
@@ -143,6 +183,6 @@
   }
 
   .navbar-cart {
-    margin-right: 15px; /* Give space from the toggle button */
+    margin-right: 15px;
   }
 }

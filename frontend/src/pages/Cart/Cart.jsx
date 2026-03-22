@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { FiTrash2 } from "react-icons/fi";
@@ -16,16 +16,39 @@ const Cart = () => {
 
   const items = cartItems || [];
 
-  // ── Quantity & remove ───────────────────────────────────────────────────
+  // ✅ AUTO-CLEAN CART
+  useEffect(() => {
+    const syncCart = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/products");
+        if (!res.ok) return;
+
+        const products = await res.json();
+        if (Array.isArray(products)) {
+          const allVariants = products.flatMap(
+            (p) => p.Variants || p.variants || []
+          );
+          const validItems = items.filter((item) => {
+            const realVariant = allVariants.find(
+              (v) => v.id === item.productVariantId
+            );
+            return realVariant && realVariant.stock > 0;
+          });
+          if (validItems.length !== items.length) setCartItems(validItems);
+        }
+      } catch (error) {
+        console.error("Error syncing cart:", error);
+      }
+    };
+    if (items.length > 0) syncCart();
+  }, []);
+
   const updateQuantity = (id, delta) => {
     const updatedItems = items.map((item) => {
       if (item.productVariantId === id) {
-        const newQuantity = (item.quantity || 1) + delta;
-        if (newQuantity < 1) return item;
-        if (newQuantity > item.stock) {
-          alert(`Solo hay ${item.stock} disponibles.`);
+        const newQuantity = item.quantity + delta;
+        if (newQuantity < 1 || (item.stock && newQuantity > item.stock))
           return item;
-        }
         return { ...item, quantity: newQuantity };
       }
       return item;
@@ -34,55 +57,48 @@ const Cart = () => {
   };
 
   const removeItem = (id) => {
-    const filtered = items.filter((item) => item.productVariantId !== id);
-    setCartItems(filtered);
+    setCartItems(items.filter((i) => i.productVariantId !== id));
   };
 
-  // ── Price calculations (mirrors backend logic for display) ──────────────
-  const totalUnits = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  const totalUnits = items.reduce((acc, i) => acc + i.quantity, 0);
   const subtotal = items.reduce(
-    (acc, item) => acc + Number(item.price) * (item.quantity || 1),
+    (acc, i) => acc + Number(i.price) * i.quantity,
     0
   );
   const freeShipping = totalUnits >= FREE_SHIPPING_THRESHOLD;
   const shippingCost = freeShipping ? 0 : SHIPPING_COST;
 
-  // ── Wompi ready check ───────────────────────────────────────────────────
-  const waitForWompi = () =>
-    new Promise((resolve, reject) => {
-      if (window.WidgetCheckout) return resolve();
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        if (window.WidgetCheckout) {
-          clearInterval(interval);
-          resolve();
-        } else if (attempts > 20) {
-          clearInterval(interval);
-          reject(new Error("Wompi script did not load in time."));
-        }
-      }, 250);
-    });
-
-  // ── Main checkout handler — receives full form including paymentMethod ───
-  const handleCreateOrder = async (customerData) => {
-    if (!items.length) return;
-
+  // ✅ HANDLE CHECKOUT (ABRE EL WIDGET DIRECTAMENTE)
+  const handleCheckout = async (formData) => {
     try {
       setLoading(true);
 
-      // 1. Create order — send paymentMethod from the modal form
-      const response = await fetch("http://localhost:3000/api/orders", {
+      // 1. Validar stock antes de disparar la orden
+      const resProducts = await fetch("http://localhost:3000/api/products");
+      const products = await resProducts.json();
+      const allVariants = products.flatMap(
+        (p) => p.Variants || p.variants || []
+      );
+
+      const invalidItem = items.find((item) => {
+        const realVariant = allVariants.find(
+          (v) => v.id === item.productVariantId
+        );
+        return !realVariant || realVariant.stock < item.quantity;
+      });
+
+      if (invalidItem) {
+        alert("Uno de los productos ya no tiene stock disponible.");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Crear la orden en el Backend
+      const res = await fetch("http://localhost:3000/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerName: customerData.customerName,
-          customerEmail: customerData.customerEmail,
-          customerPhone: customerData.customerPhone,
-          shippingAddress: customerData.shippingAddress,
-          shippingCity: customerData.shippingCity,
-          shippingPostalCode: customerData.shippingPostalCode,
-          paymentMethod: customerData.paymentMethod, // ✅ dynamic now
+          ...formData,
           items: items.map((item) => ({
             productVariantId: item.productVariantId,
             quantity: item.quantity,
@@ -90,62 +106,38 @@ const Cart = () => {
         }),
       });
 
-      const result = await response.json();
+      const responseBody = await res.json();
 
-      if (!response.ok) {
-        alert(result.message || "Error creando la orden");
-        return;
+      // Extraer checkout data (soporta raíz o .data)
+      const checkoutData =
+        responseBody.checkout ||
+        (responseBody.data && responseBody.data.checkout);
+
+      if (!checkoutData) {
+        throw new Error("No se recibió la configuración de pago del servidor.");
       }
 
-      const paymentData = result.data?.checkout;
+      // 3. 🚀 DISPARAR WIDGET DE WOMPI DIRECTAMENTE
+      // redirectUrl is required for PSE (bank redirect flow).
+      // For cards: callback fires → navigate() handles redirect.
+      // For PSE: callback is skipped → Wompi redirects to redirectUrl.
+      const checkout = new window.WidgetCheckout({
+        currency: checkoutData.currency,
+        amountInCents: checkoutData.amountInCents,
+        reference: checkoutData.reference,
+        publicKey: checkoutData.publicKey,
+        signature: { integrity: checkoutData.signature },
+        redirectUrl: checkoutData.redirectUrl,
+      });
 
-      if (!paymentData) {
-        console.error("Respuesta del servidor:", result);
-        alert("Error: El servidor no envió la información de pago.");
-        return;
-      }
-
-      const amountToPay =
-        paymentData.amountInCents || paymentData.amount_in_cents;
-
-      if (!amountToPay || !paymentData.signature) {
-        console.error("Datos incompletos:", paymentData);
-        alert("Error: Datos de pago incompletos (monto o firma ausentes).");
-        return;
-      }
-
-      // 2. Wait for Wompi widget
-      await waitForWompi();
-
-      // 3. Launch Wompi widget with the final amount (already includes surcharge if credit card)
-      const widgetConfig = {
-        currency: paymentData.currency || "COP",
-        amountInCents: Number(amountToPay),
-        reference: paymentData.reference,
-        publicKey: paymentData.publicKey,
-        "signature:integrity": paymentData.signature,
-      };
-
-      if (
-        paymentData.redirectUrl &&
-        !paymentData.redirectUrl.includes("localhost")
-      ) {
-        widgetConfig.redirectUrl = paymentData.redirectUrl;
-      }
-
-      const handler = new window.WidgetCheckout(widgetConfig);
-
-      // 4. Handle Wompi response
-      handler.open(async (res) => {
-        console.log("Wompi callback:", res);
-        const transaction = res.transaction;
+      checkout.open((result) => {
+        const transaction = result?.transaction;
 
         if (!transaction) return;
 
-        if (
-          transaction.status === "APPROVED" ||
-          transaction.status === "PENDING"
-        ) {
+        setIsModalOpen(false);
+
+        if (transaction.status === "APPROVED" || transaction.status === "PENDING") {
           setCartItems([]);
           navigate(
             `/thank-you?id=${transaction.id}&status=${transaction.status}&reference=${transaction.reference}`
@@ -155,8 +147,8 @@ const Cart = () => {
         }
       });
     } catch (error) {
-      console.error("Error en handleCreateOrder:", error);
-      alert("Hubo un error de conexión.");
+      console.error("Checkout error:", error.message);
+      alert("Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -169,19 +161,12 @@ const Cart = () => {
       </div>
     );
 
-  // ── Surcharge is shown only when user has toggled credit card in the modal
-  // We derive it from a local state passed up from the modal if needed,
-  // but for the summary we show a note instead (modal handles the toggle live)
-
   return (
     <>
       <CheckoutModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={(customerData) => {
-          setIsModalOpen(false);
-          handleCreateOrder(customerData);
-        }}
+        onConfirm={handleCheckout}
         loading={loading}
       />
 
@@ -201,20 +186,6 @@ const Cart = () => {
                   <p>
                     {item.color} / {item.size}
                   </p>
-                  <div className="cart-qty-selector">
-                    <button
-                      onClick={() => updateQuantity(item.productVariantId, -1)}
-                    >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.productVariantId, 1)}
-                      disabled={item.quantity >= item.stock}
-                    >
-                      +
-                    </button>
-                  </div>
                 </div>
                 <div className="cart-card-price">
                   <p>
@@ -224,68 +195,61 @@ const Cart = () => {
                     )}{" "}
                     COP
                   </p>
-                  <button
-                    onClick={() => removeItem(item.productVariantId)}
-                    className="delete-icon-btn"
-                  >
-                    <FiTrash2 />
-                  </button>
+                  <div className="cart-actions">
+                    <div className="cart-qty-selector">
+                      <button
+                        onClick={() =>
+                          updateQuantity(item.productVariantId, -1)
+                        }
+                      >
+                        -
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.productVariantId, 1)}
+                        disabled={item.quantity >= item.stock}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => removeItem(item.productVariantId)}
+                      className="delete-icon-btn"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* ── Order Summary ─────────────────────────────────────────────── */}
           <div className="cart-summary">
             <h3>Resumen</h3>
-
             <div className="summary-row">
               <span>Subtotal</span>
               <span>${subtotal.toLocaleString("es-CO")} COP</span>
             </div>
-
             <div className="summary-row">
               <span>Envío</span>
               <span>
-                {freeShipping ? (
-                  <span className="free-shipping-badge">¡Gratis! 🎉</span>
-                ) : (
-                  `$${shippingCost.toLocaleString("es-CO")} COP`
-                )}
+                {freeShipping
+                  ? "Gratis"
+                  : `$${shippingCost.toLocaleString("es-CO")} COP`}
               </span>
             </div>
-
-            {freeShipping && (
-              <div className="free-shipping-msg">
-                🎉 ¡Llevas {totalUnits} productos, el envío es gratis!
-              </div>
-            )}
-
-            <div className="summary-row summary-note">
-              <span>Recargo tarjeta de crédito</span>
-              <span>5% (si aplica)</span>
-            </div>
-
             <div className="summary-divider" />
-
             <div className="summary-row summary-total">
               <span>Total estimado</span>
               <span>
                 ${(subtotal + shippingCost).toLocaleString("es-CO")} COP
               </span>
             </div>
-
-            <p className="summary-disclaimer">
-              * El recargo del 5% se aplicará si pagas con tarjeta de crédito.
-              El total final se calculará al confirmar.
-            </p>
-
             <button
               className="checkout-btn"
-              disabled={loading}
               onClick={() => setIsModalOpen(true)}
             >
-              {loading ? "Procesando..." : "Finalizar Compra"}
+              Finalizar Compra
             </button>
           </div>
         </div>

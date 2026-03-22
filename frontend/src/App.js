@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 import Catalogue from "./pages/Catalogue";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
+import Contact from "./pages/Contact";
 import ThankYou from "./pages/ThankYou";
 import { CartProvider } from "./context/CartContext";
 
@@ -78,6 +79,17 @@ function App() {
                 <>
                   <Navbar />
                   <Cart />
+                  <Footer />
+                </>
+              }
+            />
+            {/* ✨ ADD THIS CONTACT ROUTE ✨ */}
+            <Route
+              path="/contact"
+              element={
+                <>
+                  <Navbar />
+                  <Contact />
                   <Footer />
                 </>
               }

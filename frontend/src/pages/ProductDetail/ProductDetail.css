@@ -1,5 +1,9 @@
+/* ProductDetail.css - Minimal Zara-Inspired Grey Aesthetic */
+
 .product-detail {
-  padding: 3rem 2rem;
+  padding: 2rem 2rem 4rem 2rem;
+  background: #ffffff;
+  min-height: 100vh;
 }
 
 .product-detail-container {
@@ -9,23 +13,26 @@
   margin: 0 auto;
 }
 
-/* LEFT SIDE */
+/* ========================================
+   LEFT SIDE - GALLERY
+   ======================================== */
 .gallery {
   flex: 1;
 }
 
 .main-image {
   width: 100%;
-  max-width: 500px;
-  height: 500px;
+  max-width: 600px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  border: 1px solid #e0e0e0;
+  background: #f4f4f4;
 }
 
 .thumbnails {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.75rem;
   margin-top: 1rem;
 }
 
@@ -34,229 +41,207 @@
   height: 80px;
   object-fit: cover;
   cursor: pointer;
-  border-radius: 8px;
-  border: 2px solid transparent;
-  transition: 0.2s ease;
+  border-radius: 0;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+  background: #f4f4f4;
 }
 
 .thumbnail:hover {
-  transform: scale(1.05);
+  border-color: #1a1a1a;
 }
 
 .thumbnail.active {
-  border: 2px solid #e91e63;
+  border: 2px solid #1a1a1a;
 }
 
-/* RIGHT SIDE */
+/* ========================================
+   RIGHT SIDE - PRODUCT INFO
+   ======================================== */
 .product-info {
   flex: 1;
+  padding-top: 1rem;
 }
 
 .product-info h1 {
-  font-size: 2.5rem;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 300;
   margin-bottom: 1rem;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
 }
 
 .description {
-  color: #555;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: #4a4a4a;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+  font-size: 0.95rem;
+  font-weight: 300;
 }
 
 .price {
-  font-size: 2rem;
-  font-weight: bold;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 400;
   margin-bottom: 2rem;
-  color: #111;
+  color: #1a1a1a;
+}
+
+/* ========================================
+   VARIANT SELECTION
+   ======================================== */
+.variant-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .variant-section h4 {
+  font-family: "Helvetica Neue", Arial, sans-serif;
   margin-bottom: 1rem;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #1a1a1a;
 }
 
 .variant-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 1.5rem;
+  gap: 0.75rem;
 }
 
 .variant-btn {
-  padding: 0.8rem 1.5rem;
-  border: 1px solid #ccc;
-  background: white;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
   cursor: pointer;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: 0.2s ease;
+  border-radius: 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .variant-btn:hover {
-  border-color: #111;
+  border-color: #1a1a1a;
+  background: #f4f4f4;
 }
 
 .variant-btn.selected {
-  background: black;
-  color: white;
-  border: 1px solid black;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #1a1a1a;
 }
 
 /* ========================================
-   TOAST NOTIFICATIONS
+   STOCK INFO
    ======================================== */
-
-/* Toast Notification Styles */
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 16px 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  animation: slideIn 0.3s ease-out;
-  min-width: 280px;
-  max-width: 400px;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(400px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.toast-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.toast-content svg {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-}
-
-.toast-success {
-  background: #10b981;
-  color: white;
-}
-
-.toast-warning {
-  background: #f59e0b;
-  color: white;
-}
-
-.toast-error {
-  background: #ef4444;
-  color: white;
-}
-
-/* ========================================
-   STOCK INFO STYLES
-   ======================================== */
-
 .stock-info {
-  margin: 16px 0;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
 }
 
 .stock-available {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #10b981;
-  background: #d1fae5;
-  padding: 8px 12px;
-  border-radius: 6px;
+  color: #1a1a1a;
+  background: #f4f4f4;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
 }
 
 .stock-low {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #f59e0b;
+  color: #1a1a1a;
   background: #fef3c7;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #f59e0b;
 }
 
 .stock-out {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ef4444;
+  color: #1a1a1a;
   background: #fee2e2;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ef4444;
 }
 
 /* ========================================
-   ACTION BUTTONS
+   ACTION BUTTONS - Zara Style
    ======================================== */
-
 .action-buttons {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
-  max-width: 500px; /* Limit width on large screens */
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 .add-to-cart-btn,
 .buy-now-btn {
   flex: 1;
-  padding: 14px 24px;
+  padding: 1rem 2rem;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s ease;
-  position: relative;
-  min-width: 180px; /* Minimum button width */
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .add-to-cart-btn {
-  background: #3b82f6;
-  color: white;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #1a1a1a;
 }
 
 .add-to-cart-btn:hover:not(:disabled) {
-  background: #2563eb;
+  background: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .buy-now-btn {
-  background: #10b981;
-  color: white;
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #1a1a1a;
 }
 
 .buy-now-btn:hover:not(:disabled) {
-  background: #059669;
+  background: #1a1a1a;
+  color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .add-to-cart-btn:disabled,
 .buy-now-btn:disabled {
-  background: #d1d5db;
-  color: #9ca3af;
+  background: #f4f4f4;
+  color: #ababab;
+  border-color: #e0e0e0;
   cursor: not-allowed;
   transform: none;
 }
@@ -289,9 +274,82 @@
 }
 
 /* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+.toast {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  padding: 1rem 1.5rem;
+  border-radius: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  animation: slideIn 0.3s ease-out;
+  min-width: 280px;
+  max-width: 400px;
+  border: 1px solid;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.toast-content svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.toast-success {
+  background: #ffffff;
+  color: #1a1a1a;
+  border-color: #1a1a1a;
+}
+
+.toast-warning {
+  background: #fef3c7;
+  color: #1a1a1a;
+  border-color: #f59e0b;
+}
+
+.toast-error {
+  background: #fee2e2;
+  color: #1a1a1a;
+  border-color: #ef4444;
+}
+
+/* ========================================
+   LOADING & ERROR STATES
+   ======================================== */
+.loading-text,
+.error-text {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 1rem;
+  color: #7a7a7a;
+  font-weight: 300;
+}
+
+/* ========================================
    RESPONSIVE
    ======================================== */
-
 @media (max-width: 900px) {
   .product-detail-container {
     flex-direction: column;
@@ -299,18 +357,25 @@
   }
 
   .main-image {
-    height: auto;
-    aspect-ratio: 1/1;
+    max-width: 100%;
   }
 
-  .action-buttons {
-    max-width: 100%;
+  .product-info h1 {
+    font-size: 1.75rem;
+  }
+
+  .price {
+    font-size: 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
+  .product-detail {
+    padding: 1.5rem 1rem 3rem 1rem;
+  }
+
   .toast {
-    top: 10px;
+    top: 70px;
     right: 10px;
     left: 10px;
     min-width: auto;
@@ -318,5 +383,18 @@
 
   .action-buttons {
     flex-direction: column;
+  }
+
+  .product-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .thumbnails {
+    gap: 0.5rem;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: 60px;
   }
 }

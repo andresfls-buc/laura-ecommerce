@@ -1,8 +1,11 @@
+/* Footer.css - Minimal Zara-Inspired Grey Theme */
+
 .footer {
-  background-color: #111;
-  color: white;
+  background-color: #f8f8f8;
+  color: #1a1a1a;
   padding: 3rem 2rem 1rem 2rem;
   margin-top: 4rem;
+  border-top: 1px solid #e0e0e0;
 }
 
 .footer-container {
@@ -14,6 +17,11 @@
 .footer-section h3,
 .footer-section h4 {
   margin-bottom: 1rem;
+  color: #1a1a1a;
+  font-weight: 400;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 /* Footer Links */
@@ -29,28 +37,83 @@
 
 .footer-section ul li a {
   text-decoration: none;
-  color: white;
-  font-size: 15px;
-  transition: color 0.3s ease, transform 0.3s ease;
+  color: #4a4a4a;
+  font-size: 14px;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+  display: inline-block;
 }
 
 .footer-section ul li a:hover {
-  color: #e91e63;
-  transform: translateX(5px)
+  color: #1a1a1a;
+  transform: translateX(3px);
+}
+
+.footer-payment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.footer-payment-label {
+  font-size: 0.8rem;
+  color: #7a7a7a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.payment-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.payment-icons svg {
+  font-size: 2.2rem;
+  color: #4a4a4a;
+  transition: color 0.2s ease;
+}
+
+.payment-icons svg:hover {
+  color: #1a1a1a;
+}
+
+.pse-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background-color: #1a1a1a;
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
 .footer-bottom {
   text-align: center;
-  margin-top: 2rem;
-  font-size: 0.9rem;
-  opacity: 0.7;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #7a7a7a;
+  border-top: 1px solid #e0e0e0;
   padding-top: 1rem;
 }
 
 .footer-brand img {
-  height: 50px;        /* controls logo size */
-  width: auto;         /* keeps proportions */
+  height: 50px;
+  width: auto;
   margin-bottom: 10px;
-  filter: brightness(0) invert(1);
+  filter: none;
+}
+
+/* Optional: Footer description text */
+.footer-section p {
+  color: #4a4a4a;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 300;
 }

@@ -1,49 +1,117 @@
-/* ── Home.css ─────────────────────────────────────────────────── */
+/* ── Home.css - Minimal Zara-Inspired Grey Aesthetic ─────────── */
 
 .home-container {
-  font-family: Arial, sans-serif;
-  color: #333;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: #1a1a1a;
 }
 
 /* ── BANNER ─────────────────────────────────────────────────── */
 .banner-section {
-  background-color: #111;
-  padding: 80px 20px;
+  background-color: #f4f4f4;
+  padding: 0;
+  position: relative;
+  height: 80vh;
+  min-height: 500px;
+  overflow: hidden;
+}
+
+/* Background image overlay */
+.banner-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Dark overlay for better text readability */
+.banner-background::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  padding: 40px 20px;
   color: white;
 }
 
 .banner-title {
-  font-size: 2.4rem;
-  margin-bottom: 10px;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 1rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .banner-subtitle {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  margin-bottom: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .banner-btn {
-  background-color: #e91e63;
-  color: white;
-  padding: 12px 24px;
-  font-size: 1rem;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  padding: 1rem 2.5rem;
+  font-size: 0.9rem;
   border: none;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 0;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.banner-btn:hover {
+  background-color: #2c2c2c;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* ── PRODUCTS SECTION ───────────────────────────────────────── */
 .products-section {
-  padding: 40px 16px;
+  padding: 60px 16px;
   text-align: center;
-  max-width: 1400px; /* Limit maximum width */
-  margin: 0 auto; /* Center the section */
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #ffffff;
 }
 
 .section-title {
-  font-size: 1.6rem;
-  margin-bottom: 20px;
+  font-size: 1.8rem;
+  margin-bottom: 40px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #1a1a1a;
 }
 
 /* Responsive grid with better spacing and max card width */
@@ -60,6 +128,11 @@
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+  }
+
+  .banner-section {
+    height: 60vh;
+    min-height: 400px;
   }
 }
 
@@ -90,8 +163,9 @@
 
 /* ── COLLECTIONS SECTION ────────────────────────────────────── */
 .collections-section {
-  padding: 40px 16px;
+  padding: 60px 16px;
   text-align: center;
+  background-color: #f8f8f8;
 }
 
 .collections-grid {
@@ -111,19 +185,26 @@
 
 .collection-card {
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: 0;
   overflow: hidden;
   aspect-ratio: 1 / 1;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.collection-card:hover {
+  border-color: #2c2c2c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .collection-img {
   width: 100%;
   height: 100%;
-  border-radius: 10px;
-  background-color: #ddd;
+  border-radius: 0;
+  background-color: #f4f4f4;
   transition: transform 0.3s ease;
 }
 
 .collection-card:hover .collection-img {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
