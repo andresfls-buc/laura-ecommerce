@@ -7,7 +7,6 @@ import {
   FiMapPin,
   FiMap,
   FiHash,
-  FiCreditCard,
 } from "react-icons/fi";
 import "./CheckoutModal.css";
 
@@ -18,7 +17,7 @@ const initialForm = {
   shippingAddress: "",
   shippingCity: "",
   shippingPostalCode: "",
-  paymentMethod: "wompi", // default
+  paymentMethod: "wompi", // always handled by backend now
 };
 
 const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
@@ -27,59 +26,67 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
 
   const validate = () => {
     const newErrors = {};
+
     if (!form.customerName.trim())
       newErrors.customerName = "El nombre es obligatorio.";
+
     if (!form.customerEmail.trim()) {
       newErrors.customerEmail = "El correo es obligatorio.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerEmail)) {
       newErrors.customerEmail = "Ingresa un correo válido.";
     }
+
     if (!form.customerPhone.trim()) {
       newErrors.customerPhone = "El teléfono es obligatorio.";
     } else if (!/^\d{7,15}$/.test(form.customerPhone.replace(/\s/g, ""))) {
       newErrors.customerPhone = "Ingresa un teléfono válido.";
     }
+
     if (!form.shippingAddress.trim())
       newErrors.shippingAddress = "La dirección es obligatoria.";
+
     if (!form.shippingCity.trim())
       newErrors.shippingCity = "La ciudad es obligatoria.";
+
     if (!form.shippingPostalCode.trim()) {
       newErrors.shippingPostalCode = "El código postal es obligatorio.";
     } else if (!/^\d{4,10}$/.test(form.shippingPostalCode)) {
       newErrors.shippingPostalCode = "Ingresa un código postal válido.";
     }
+
     return newErrors;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
 
-  // ── Toggle credit card surcharge ────────────────────────────────────────
-  const handleCreditCardToggle = () => {
     setForm((prev) => ({
       ...prev,
-      paymentMethod:
-        prev.paymentMethod === "credit_card" ? "wompi" : "credit_card",
+      [name]: value,
     }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
   const handleSubmit = () => {
     const validationErrors = validate();
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
+
     onConfirm(form);
   };
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) onClose();
   };
-
-  const isCreditCard = form.paymentMethod === "credit_card";
 
   if (!isOpen) return null;
 
@@ -92,6 +99,7 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
             <span className="modal-step">Paso 1 de 2</span>
             <h2 className="modal-title">Datos de envío</h2>
           </div>
+
           <button
             className="modal-close-btn"
             onClick={onClose}
@@ -101,7 +109,6 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
           </button>
         </div>
 
-        {/* Divider */}
         <div className="modal-divider" />
 
         {/* Form */}
@@ -113,7 +120,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 <FiUser className="label-icon" /> Nombre completo
               </label>
               <input
-                className={`form-input ${errors.customerName ? "input-error" : ""}`}
+                className={`form-input ${
+                  errors.customerName ? "input-error" : ""
+                }`}
                 type="text"
                 name="customerName"
                 placeholder="Ej. Juan Pérez"
@@ -131,7 +140,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 <FiMail className="label-icon" /> Correo electrónico
               </label>
               <input
-                className={`form-input ${errors.customerEmail ? "input-error" : ""}`}
+                className={`form-input ${
+                  errors.customerEmail ? "input-error" : ""
+                }`}
                 type="email"
                 name="customerEmail"
                 placeholder="correo@ejemplo.com"
@@ -149,7 +160,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 <FiPhone className="label-icon" /> Teléfono
               </label>
               <input
-                className={`form-input ${errors.customerPhone ? "input-error" : ""}`}
+                className={`form-input ${
+                  errors.customerPhone ? "input-error" : ""
+                }`}
                 type="tel"
                 name="customerPhone"
                 placeholder="3001234567"
@@ -167,7 +180,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 <FiMapPin className="label-icon" /> Dirección de envío
               </label>
               <input
-                className={`form-input ${errors.shippingAddress ? "input-error" : ""}`}
+                className={`form-input ${
+                  errors.shippingAddress ? "input-error" : ""
+                }`}
                 type="text"
                 name="shippingAddress"
                 placeholder="Calle 123 # 45-67, Apto 201"
@@ -185,7 +200,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 <FiMap className="label-icon" /> Ciudad
               </label>
               <input
-                className={`form-input ${errors.shippingCity ? "input-error" : ""}`}
+                className={`form-input ${
+                  errors.shippingCity ? "input-error" : ""
+                }`}
                 type="text"
                 name="shippingCity"
                 placeholder="Bogotá"
@@ -203,7 +220,9 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
                 <FiHash className="label-icon" /> Código postal
               </label>
               <input
-                className={`form-input ${errors.shippingPostalCode ? "input-error" : ""}`}
+                className={`form-input ${
+                  errors.shippingPostalCode ? "input-error" : ""
+                }`}
                 type="text"
                 name="shippingPostalCode"
                 placeholder="110111"
@@ -215,29 +234,6 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
               )}
             </div>
           </div>
-
-          {/* ── Credit Card Toggle ─────────────────────────────────────────── */}
-          <div
-            className={`credit-card-toggle ${isCreditCard ? "active" : ""}`}
-            onClick={handleCreditCardToggle}
-          >
-            <div className="credit-card-toggle-left">
-              <FiCreditCard className="credit-card-icon" />
-              <div className="credit-card-toggle-text">
-                <span className="credit-card-label">
-                  Pagar con tarjeta de crédito
-                </span>
-                <span className="credit-card-sublabel">
-                  {isCreditCard
-                    ? "Se aplicará un recargo del 5% sobre el total"
-                    : "Aplica un recargo del 5% sobre el total"}
-                </span>
-              </div>
-            </div>
-            <div className={`toggle-switch ${isCreditCard ? "on" : "off"}`}>
-              <div className="toggle-knob" />
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
@@ -245,6 +241,7 @@ const CheckoutModal = ({ isOpen, onClose, onConfirm, loading }) => {
           <button className="btn-cancel" onClick={onClose} disabled={loading}>
             Volver al carrito
           </button>
+
           <button className="btn-pay" onClick={handleSubmit} disabled={loading}>
             {loading ? (
               <span className="btn-loading">

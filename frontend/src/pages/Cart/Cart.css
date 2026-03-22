@@ -1,16 +1,24 @@
-/* Main Page Layout */
+/* Cart.css - Minimal Zara-Inspired Grey Aesthetic */
+
+/* ========================================
+   MAIN PAGE LAYOUT
+   ======================================== */
 .cart-page {
-  padding: 4rem 2rem;
+  padding: 3rem 2rem 4rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: "Inter", sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
 }
 
 .cart-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 300;
+  margin-bottom: 3rem;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #1a1a1a;
 }
 
 .cart-container {
@@ -19,7 +27,9 @@
   align-items: flex-start;
 }
 
-/* LEFT SIDE: CARDS */
+/* ========================================
+   LEFT SIDE - CART ITEMS
+   ======================================== */
 .cart-items-section {
   flex: 2;
 }
@@ -28,17 +38,22 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  background: #fff;
-  padding: 1.5rem;
-  border-bottom: 1px solid #eee;
-  transition: 0.3s;
+  background: #ffffff;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.cart-card:hover {
+  background: #fafafa;
 }
 
 .cart-card-img {
   width: 120px;
   height: 140px;
   object-fit: cover;
-  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #f4f4f4;
 }
 
 .cart-card-info {
@@ -46,190 +61,243 @@
 }
 
 .cart-card-info h3 {
-  font-size: 1.2rem;
+  font-size: 1rem;
+  font-weight: 400;
   margin-bottom: 0.5rem;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .cart-card-info p {
-  color: #777;
+  color: #555;
   font-size: 0.9rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* Qty Buttons */
+/* ========================================
+   QUANTITY SELECTOR
+   ======================================== */
 .cart-qty-selector {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-top: 1rem;
 }
 
 .cart-qty-selector button {
   width: 32px;
   height: 32px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
   cursor: pointer;
-  border-radius: 4px;
-  font-weight: bold;
+  font-size: 1.1rem;
+  color: #1a1a1a;
 }
 
 .cart-qty-selector button:hover:not(:disabled) {
-  background: #e91e63;
-  color: white;
-  border-color: #e91e63;
+  background: #1a1a1a;
+  color: #ffffff;
 }
 
-/* RIGHT SIDE OF CARD: PRICE & DELETE */
+.cart-qty-selector span {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ========================================
+   CARD PRICE & ACTIONS
+   ======================================== */
 .cart-card-price {
   text-align: right;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
   justify-content: space-between;
-  height: 100px;
+  align-items: flex-end;
+  height: 140px;
 }
 
 .cart-card-price p {
-  font-weight: bold;
+  font-weight: 500; /* 🔥 stronger */
   font-size: 1.1rem;
-  margin: 0;
+  color: #111; /* 🔥 more contrast */
+}
+
+/* actions */
+.cart-actions {
+  display: flex;
+  align-items: center;
 }
 
 /* DELETE BUTTON */
 .delete-icon-btn {
-  background: #f8f8f8;
-  color: #333;
-  border: none;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #e0e0e0;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.2s ease;
+  margin-left: 3rem; /* better spacing */
 }
 
 .delete-icon-btn:hover {
-  background: #ff4d4d;
-  color: white;
-  transform: scale(1.1);
+  background: #1a1a1a;
+  color: #ffffff;
 }
 
-/* RIGHT SIDE: SUMMARY BOX */
+/* ========================================
+   SUMMARY BOX
+   ======================================== */
 .cart-summary {
   flex: 1;
-  background: #fdfdfd;
+  background: #f8f8f8;
   padding: 2rem;
-  border: 1px solid #eee;
-  border-radius: 12px;
+  border: 1px solid #e0e0e0;
   position: sticky;
   top: 100px;
 }
 
 .cart-summary h3 {
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  color: #1a1a1a;
 }
 
+/* rows */
 .summary-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
-  color: #555;
+  font-size: 0.95rem;
 }
 
-.summary-row.total {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid #eee;
-  font-weight: 800;
-  font-size: 1.3rem;
-  color: #000;
+/* 🔥 labels darker */
+.summary-row span:first-child {
+  text-transform: uppercase;
+  color: #333;
+  font-weight: 400;
 }
 
-/* ── NEW: Free shipping badge ── */
-.free-shipping-badge {
-  color: #16a34a;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-/* ── NEW: Free shipping message banner ── */
-.free-shipping-msg {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #15803d;
-  border-radius: 8px;
-  padding: 0.6rem 0.9rem;
-  font-size: 0.82rem;
+/* 🔥 prices stronger */
+.summary-row span:last-child {
+  color: #111;
   font-weight: 500;
-  margin-bottom: 1rem;
 }
 
-/* ── NEW: Surcharge note row (dimmed) ── */
+/* surcharge label fix */
+.summary-row.summary-note span:first-child {
+  text-transform: capitalize;
+  color: #444;
+}
+
+/* softer 5% */
+.summary-row.summary-note span:last-child {
+  font-weight: 400;
+  color: #666;
+}
+
+/* surcharge container */
 .summary-row.summary-note {
-  color: #aaa;
-  font-size: 0.82rem;
-  font-style: italic;
-  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: #fafafa;
+  border-left: 2px solid #dcdcdc;
 }
 
-/* ── NEW: Divider before total ── */
+/* divider stronger */
 .summary-divider {
   height: 1px;
-  background: #eee;
-  margin: 0.75rem 0 1rem;
+  background: #d6d6d6;
+  margin: 1.5rem 0;
 }
 
-/* ── NEW: Total row ── */
+/* total */
 .summary-row.summary-total {
-  font-weight: 800;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+}
+
+/* 🔥 total label */
+.summary-row.summary-total span:first-child {
+  font-weight: 500;
+  color: #111;
+}
+
+/* 🔥 total price stronger */
+.summary-row.summary-total span:last-child {
+  font-weight: 600;
   color: #000;
-  margin-bottom: 0.5rem;
 }
 
-/* ── NEW: Disclaimer below total ── */
+/* disclaimer */
 .summary-disclaimer {
-  font-size: 0.75rem;
-  color: #aaa;
-  margin-top: 0.4rem;
-  margin-bottom: 0;
+  font-size: 0.78rem;
+  color: #666;
+  margin-top: 0.75rem;
   line-height: 1.5;
+  padding: 0.75rem 1rem;
+  background: #fdfdfd;
+  border-left: 2px solid #d0d0d0;
 }
 
+/* button */
 .checkout-btn {
   width: 100%;
-  padding: 1.2rem;
-  background: #000;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
+  padding: 1rem 2rem;
+  background: #1a1a1a;
+  color: #ffffff;
   margin-top: 2rem;
-  transition: 0.3s;
+  cursor: pointer;
+  text-transform: uppercase;
 }
 
 .checkout-btn:hover {
-  background: #e91e63;
+  background: #000;
 }
 
-.checkout-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* ========================================
+   EMPTY CART
+   ======================================== */
+.cart-empty {
+  text-align: center;
+  padding: 4rem 2rem;
 }
 
-/* RESPONSIVE */
+.cart-empty h2 {
+  font-size: 1.5rem;
+  color: #7a7a7a;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
 @media (max-width: 900px) {
   .cart-container {
     flex-direction: column;
   }
+
   .cart-summary {
     width: 100%;
     position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .cart-card {
+    flex-wrap: wrap;
+  }
+
+  .cart-card-price {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: auto;
   }
 }

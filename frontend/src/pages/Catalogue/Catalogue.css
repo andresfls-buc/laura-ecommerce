@@ -1,16 +1,170 @@
-.catalogue-container {
-  padding: 3rem 2rem;
-  min-height: 80vh;
+/* Catalogue.css - Minimal Zara-Inspired Grey Aesthetic */
+
+.catalogue-page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Hero Section */
+.catalogue-hero {
+  position: relative;
+  padding: 4rem 2rem 3rem 2rem;
+  background: linear-gradient(135deg, #e8e8e8 0%, #f2f2f2 50%, #e8e8e8 100%);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.catalogue-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.5) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .catalogue-title {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.catalogue-subtitle {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  color: #4a4a4a;
+  letter-spacing: 0.02em;
+}
+
+/* Container */
+.catalogue-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+/* Products Count */
+.products-count {
   text-align: center;
   margin-bottom: 2rem;
-  font-size: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.products-count span {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #4a4a4a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Products Grid - ONLY GRID LAYOUT, NO CARD STYLES */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-bottom: 3rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive Grid - ONLY LAYOUT */
+@media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-state p {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  color: #7a7a7a;
+  letter-spacing: 0.05em;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state h3 {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  color: #7a7a7a;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 2rem;
+  animation: fadeIn 0.5s ease-in;
 }
