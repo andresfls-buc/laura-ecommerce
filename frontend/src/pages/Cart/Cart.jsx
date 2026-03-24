@@ -41,7 +41,7 @@ const Cart = () => {
       }
     };
     if (items.length > 0) syncCart();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateQuantity = (id, delta) => {
     const updatedItems = items.map((item) => {

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import sequelize from "../config/sequelize.js";
 import { Order, Order_items, ProductVariant } from "../models/index.js";
 import { sendPostPaymentEmails } from "../services/emailService.js";
 
@@ -151,16 +152,45 @@ async function handleApprovedPayment(order, transaction, reference) {
     return;
   }
 
-  await order.update({
-    paymentStatus: "paid",
-    status: "paid",
-    wompiTransactionId: transaction.id,
-    paymentMethod: isCardPayment
-      ? "credit_card"
-      : mapPaymentMethod(wompiPaymentType),
-    creditCardSurcharge,
-    totalAmount,
-  });
+  // ── Decrement stock now that payment is confirmed ──────────────────────
+  const dbTransaction = await sequelize.transaction();
+  try {
+    const itemsToDecrement = await Order_items.findAll({
+      where: { orderId: order.id },
+      include: [{ model: ProductVariant, as: "productVariant" }],
+      transaction: dbTransaction,
+    });
+
+    for (const item of itemsToDecrement) {
+      if (item.productVariant) {
+        item.productVariant.stock = Math.max(
+          0,
+          item.productVariant.stock - item.quantity
+        );
+        await item.productVariant.save({ transaction: dbTransaction });
+      }
+    }
+
+    await order.update(
+      {
+        paymentStatus: "paid",
+        status: "paid",
+        wompiTransactionId: transaction.id,
+        paymentMethod: isCardPayment
+          ? "credit_card"
+          : mapPaymentMethod(wompiPaymentType),
+        creditCardSurcharge,
+        totalAmount,
+      },
+      { transaction: dbTransaction }
+    );
+
+    await dbTransaction.commit();
+  } catch (err) {
+    await dbTransaction.rollback();
+    console.error(`❌ Error actualizando stock/orden #${reference}:`, err.message);
+    return;
+  }
 
   console.log(`✅ Orden #${reference} PAGADA | Total: $${totalAmount}`);
 
@@ -188,20 +218,9 @@ async function handleApprovedPayment(order, transaction, reference) {
 
 // ── HANDLE FAILED PAYMENT ────────────────────────────────────────────────────
 async function handleFailedPayment(order, transaction, reference, wompiStatus) {
-  console.log(`❌ Pago fallido — Orden #${reference}`);
+  console.log(`❌ Pago fallido — Orden #${reference} | Estado: ${wompiStatus}`);
 
-  const orderItems = await Order_items.findAll({
-    where: { orderId: order.id },
-    include: [{ model: ProductVariant, as: "productVariant" }],
-  });
-
-  for (const item of orderItems) {
-    if (item.productVariant) {
-      item.productVariant.stock += item.quantity;
-      await item.productVariant.save();
-    }
-  }
-
+  // Stock was never decremented (only decremented on APPROVED), so no restore needed
   await order.update({
     paymentStatus: "unpaid",
     status: "cancelled",

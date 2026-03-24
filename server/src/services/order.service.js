@@ -105,9 +105,7 @@ class OrderService {
           },
           { transaction }
         );
-
-        variant.stock -= item.quantity;
-        await variant.save({ transaction });
+        // Stock is decremented only after payment is confirmed (see webhookController)
       }
 
       await transaction.commit();
@@ -213,7 +211,8 @@ class OrderService {
         throw Boom.badRequest("Invalid status transition");
       }
 
-      if (newStatus === "cancelled") {
+      // Only restore stock if payment was already confirmed (stock was decremented at webhook)
+      if (newStatus === "cancelled" && order.paymentStatus === "paid") {
         for (const item of order.items) {
           const variant = await ProductVariant.findByPk(item.productVariantId, {
             transaction,

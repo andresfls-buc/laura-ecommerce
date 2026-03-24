@@ -1,4 +1,5 @@
 // src/Home.jsx
+import { Link } from "react-router-dom";
 import ProductCard from "../../components/ProductCard";
 import { useProducts } from "../../hooks/useProducts";
 import "./Home.css";
@@ -35,7 +36,7 @@ const Home = () => {
         <div className="banner-content">
           <h1 className="banner-title">Descubre la nueva colección</h1>
           <p className="banner-subtitle">Viste con estilo cada día</p>
-          <button className="banner-btn">Ver productos</button>
+          <Link to="/catalogue" className="banner-btn">Ver productos</Link>
         </div>
       </section>
 

@@ -7,6 +7,15 @@ import {
   HiCheckCircle,
   HiTag,
 } from "react-icons/hi2";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import "../styles/admin-ui.css";
 
 const formatCOP = (value) =>
@@ -24,8 +33,8 @@ export default function Dashboard() {
   useEffect(() => {
     Promise.all([getOrders(), getProducts()])
       .then(([o, p]) => {
-        setOrders(o.orders || o.data || []);
-        setProducts(p.products || p.data || []);
+        setOrders(o.orders || o.data || o || []);
+        setProducts(p.products || p.data || p || []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -42,6 +51,28 @@ export default function Dashboard() {
   const totalRevenue = orders
     .filter((o) => ["paid", "completed"].includes(o.status))
     .reduce((s, o) => s + parseFloat(o.totalAmount || 0), 0);
+
+  // Build last-30-days sales chart data
+  const salesChartData = (() => {
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push({
+        date: d.toLocaleDateString("es-CO", { day: "2-digit", month: "short" }),
+        isoDate: d.toISOString().slice(0, 10),
+        ventas: 0,
+      });
+    }
+    orders
+      .filter((o) => ["paid", "completed"].includes(o.status))
+      .forEach((o) => {
+        const orderDate = (o.createdAt || o.updatedAt || "").slice(0, 10);
+        const day = days.find((d) => d.isoDate === orderDate);
+        if (day) day.ventas += parseFloat(o.totalAmount || 0);
+      });
+    return days.map(({ date, ventas }) => ({ date, ventas }));
+  })();
 
   const KPI_CARDS = [
     { icon: <HiBanknotes />, label: "Revenue", value: formatCOP(totalRevenue) },
@@ -96,6 +127,62 @@ export default function Dashboard() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* ── Sales Chart ── */}
+      <div className="card" style={{ padding: "1.2rem" }}>
+        <h2 style={{ margin: "0 0 1.2rem 0", fontSize: "1.1rem" }}>
+          Ventas últimos 30 días
+        </h2>
+        <ResponsiveContainer width="100%" height={240}>
+          <AreaChart data={salesChartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+            <defs>
+              <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border, #e5e7eb)" />
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 11, fill: "var(--text-muted, #9ca3af)" }}
+              interval={4}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              tickFormatter={(v) =>
+                v >= 1000000
+                  ? `$${(v / 1000000).toFixed(1)}M`
+                  : v >= 1000
+                  ? `$${(v / 1000).toFixed(0)}K`
+                  : `$${v}`
+              }
+              tick={{ fontSize: 11, fill: "var(--text-muted, #9ca3af)" }}
+              tickLine={false}
+              axisLine={false}
+              width={60}
+            />
+            <Tooltip
+              formatter={(value) => [formatCOP(value), "Ventas"]}
+              contentStyle={{
+                background: "var(--card, #1e1e2e)",
+                border: "1px solid var(--border, #e5e7eb)",
+                borderRadius: "8px",
+                fontSize: "0.8rem",
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="ventas"
+              stroke="#6366f1"
+              strokeWidth={2}
+              fill="url(#colorVentas)"
+              dot={false}
+              activeDot={{ r: 4 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
 
       <div className="card">

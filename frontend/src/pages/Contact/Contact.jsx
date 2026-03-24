@@ -14,6 +14,8 @@ const Contact = () => {
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [activeFaq, setActiveFaq] = useState(null);
 
   const handleChange = (e) => {
@@ -23,30 +25,41 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError("");
 
-    // Show success message
-    setShowSuccess(true);
+    try {
+      const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+      const res = await fetch(`${BASE_URL}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    // Reset form
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      subject: "",
-      orderNumber: "",
-      message: "",
-    });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al enviar el mensaje.");
+      }
 
-    // Hide success message after 5 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 5000);
+      setShowSuccess(true);
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        subject: "",
+        orderNumber: "",
+        message: "",
+      });
 
-    // In production, send data to your backend
-    console.log("Form submitted:", formData);
+      setTimeout(() => setShowSuccess(false), 5000);
+    } catch (error) {
+      setSubmitError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const toggleFaq = (index) => {
@@ -130,6 +143,12 @@ const Contact = () => {
             {showSuccess && (
               <div className="success-message">
                 ✓ ¡Gracias por tu mensaje! Te responderemos dentro de 24 horas.
+              </div>
+            )}
+
+            {submitError && (
+              <div className="error-message" style={{ color: "#c0392b", background: "#fdecea", border: "1px solid #f5c6cb", borderRadius: "6px", padding: "12px 16px", marginBottom: "16px" }}>
+                ✗ {submitError}
               </div>
             )}
 
@@ -249,8 +268,8 @@ const Contact = () => {
                 ></textarea>
               </div>
 
-              <button type="submit" className="submit-button">
-                <span>Enviar Mensaje</span>
+              <button type="submit" className="submit-button" disabled={isSubmitting}>
+                <span>{isSubmitting ? "Enviando..." : "Enviar Mensaje"}</span>
               </button>
             </form>
           </div>

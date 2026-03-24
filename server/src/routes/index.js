@@ -5,6 +5,7 @@ import orderRouter from "./order.routes.js";
 import authRouter from "./auth.routes.js";
 import userRouter from "./user.routes.js";
 import paymentsRouter from "./payments.routes.js";
+import contactRouter from "./contact.routes.js";
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.use("/orders", orderRouter);
 router.use("/auth", authRouter);
 router.use("/users", userRouter);
 router.use("/payments", paymentsRouter);
+router.use("/contact", contactRouter);
 
 
 
