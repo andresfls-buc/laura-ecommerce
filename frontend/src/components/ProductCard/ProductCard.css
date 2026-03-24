@@ -107,9 +107,9 @@
 }
 
 .exhausted {
-  border: 1px solid #1a1a1a;
-  color: #1a1a1a;
-  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #c0392b;
+  color: white;
+  background: #e74c3c;
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */

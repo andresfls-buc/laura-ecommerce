@@ -234,32 +234,28 @@ export default function Inventory() {
       </div>
 
       {/* ── Summary stats ── */}
-      <div className="inv-summary">
-        <div className="card inv-stat-card">
-          <div className="inv-stat-value">{items.length}</div>
-          <div className="inv-stat-label">Products</div>
-        </div>
-        <div className="card inv-stat-card">
-          <div className="inv-stat-value">
-            {items.reduce((a, i) => a + (i.stock || 0), 0)}
+      {(() => {
+        const outOfStockCount = items.filter((i) =>
+          (i.variants?.reduce((acc, v) => acc + (v.stock || 0), 0) ?? 0) === 0
+        ).length;
+        return (
+          <div className="inv-summary">
+            <div className="card inv-stat-card">
+              <div className="inv-stat-value">{items.length}</div>
+              <div className="inv-stat-label">Products</div>
+            </div>
+            <div className="card inv-stat-card">
+              <div
+                className="inv-stat-value"
+                style={{ color: outOfStockCount > 0 ? "#f87171" : "var(--text)" }}
+              >
+                {outOfStockCount}
+              </div>
+              <div className="inv-stat-label">Out of Stock</div>
+            </div>
           </div>
-          <div className="inv-stat-label">Total Units</div>
-        </div>
-        <div className="card inv-stat-card">
-          <div
-            className="inv-stat-value"
-            style={{
-              color:
-                items.filter((i) => (i.stock || 0) === 0).length > 0
-                  ? "#f87171"
-                  : "var(--text)",
-            }}
-          >
-            {items.filter((i) => (i.stock || 0) === 0).length}
-          </div>
-          <div className="inv-stat-label">Out of Stock</div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* ── Search ── */}
       <div className="inv-search-wrap">

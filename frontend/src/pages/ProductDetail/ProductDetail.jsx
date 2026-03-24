@@ -9,7 +9,7 @@ import { FiCheckCircle, FiAlertTriangle, FiXCircle } from "react-icons/fi";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { addToCart, cart } = useCart();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
@@ -172,21 +172,13 @@ const ProductDetail = () => {
           )}
 
           {/* Stock indicator */}
-          <div className="stock-info">
-            {isOutOfStock ? (
+          {isOutOfStock && (
+            <div className="stock-info">
               <span className="stock-out">
                 <FiXCircle /> Agotado
               </span>
-            ) : currentStock <= 5 ? (
-              <span className="stock-low">
-                <FiAlertTriangle /> Solo quedan {currentStock} unidades
-              </span>
-            ) : (
-              <span className="stock-available">
-                <FiCheckCircle /> Stock disponible: {currentStock} unidades
-              </span>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Action buttons */}
           <div className="action-buttons">

@@ -58,8 +58,8 @@ const ProductCard = ({ product }) => {
             className="product-image"
           />
 
-          {/* EXHAUSTED BADGE */}
-          {isExhausted && <span className="badge exhausted">EXHAUSTED</span>}
+          {/* AGOTADO BADGE */}
+          {isExhausted && <span className="badge exhausted">AGOTADO</span>}
 
           {/* OFFER BADGE */}
           {hasDiscount && !isExhausted && (

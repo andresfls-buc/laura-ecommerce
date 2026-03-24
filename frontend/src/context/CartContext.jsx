@@ -29,7 +29,6 @@ export const CartProvider = ({ children }) => {
       if (existingItem) {
         // STOCK CHECK
         if (existingItem.quantity >= newItem.stock) {
-          alert(`Lo sentimos, solo hay ${newItem.stock} unidades disponibles.`);
           success = false; // ❌ Mark as failed
           return prevCart;
         }
