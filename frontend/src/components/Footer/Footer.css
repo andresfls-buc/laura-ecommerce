@@ -110,6 +110,22 @@
   filter: none;
 }
 
+.footer-social {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.footer-social a {
+  color: #4a4a4a;
+  font-size: 1.4rem;
+  transition: color 0.2s ease;
+}
+
+.footer-social a:hover {
+  color: #1a1a1a;
+}
+
 /* Optional: Footer description text */
 .footer-section p {
   color: #4a4a4a;

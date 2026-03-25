@@ -1,5 +1,17 @@
 /* ── Home.css - Minimal Zara-Inspired Grey Aesthetic ─────────── */
 
+/* ── PROMO BAR ───────────────────────────────────────────────── */
+.promo-bar {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  text-align: center;
+  padding: 0.55rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .home-container {
   font-family: "Helvetica Neue", Arial, sans-serif;
   color: #1a1a1a;

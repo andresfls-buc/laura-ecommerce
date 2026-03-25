@@ -133,6 +133,10 @@ export default function Orders() {
     parseFloat(order.creditCardSurcharge || 0) > 0;
   const isFreeShipping = (order) =>
     parseFloat(order.shippingCost || 0) === 0 && (order.totalUnits || 0) >= 3;
+  const isSurchargeBypassed = (order) =>
+    order.paymentMethod === "credit_card" &&
+    parseFloat(order.creditCardSurcharge || 0) === 0 &&
+    order.paymentStatus === "paid";
 
   if (loading) {
     return (
@@ -246,6 +250,11 @@ export default function Orders() {
                       >
                         {o.status}
                       </span>
+                      {isSurchargeBypassed(o) && (
+                        <div className="surcharge-bypass-badge">
+                          ⚠️ Recargo eludido
+                        </div>
+                      )}
                     </td>
                     <td
                       style={{
@@ -289,6 +298,20 @@ export default function Orders() {
 
             {/* DRAWER BODY */}
             <div className="ord-drawer-body">
+              {/* SURCHARGE BYPASS ALERT */}
+              {isSurchargeBypassed(selectedOrder) && (
+                <div className="surcharge-bypass-alert">
+                  <strong>⚠️ Recargo eludido</strong>
+                  <p>
+                    El cliente seleccionó otro método de pago pero pagó con
+                    tarjeta de crédito, evitando el recargo del 5%. El pedido
+                    fue retenido y <strong>no se ha despachado</strong>.
+                    Contacta al cliente o solicita el pago del recargo antes de
+                    procesar.
+                  </p>
+                </div>
+              )}
+
               {/* STATUS TEXT ROW */}
               <div className="ord-status-row">
                 <span

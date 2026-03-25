@@ -1926,6 +1926,42 @@
   margin: 2px 0 4px;
 }
 
+/* ── SURCHARGE BYPASS ───────────────────────────────────────── */
+.admin-shell .surcharge-bypass-badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  padding: 2px 6px;
+  letter-spacing: 0.02em;
+}
+
+.admin-shell .surcharge-bypass-alert {
+  background: #fff7ed;
+  border: 1.5px solid #fb923c;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-shell .surcharge-bypass-alert strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #c2410c;
+  margin-bottom: 0.35rem;
+}
+
+.admin-shell .surcharge-bypass-alert p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #7c2d12;
+  line-height: 1.5;
+}
+
 /* ── STATUS BUTTONS ─────────────────────────────────────────── */
 .admin-shell .ord-status-btns {
   display: flex;

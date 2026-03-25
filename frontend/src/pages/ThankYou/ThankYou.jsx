@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 import "./ThankYou.css";
 
 const ThankYou = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { setCartItems } = useCart();
   const [visible, setVisible] = useState(false);
 
   const transactionId = searchParams.get("id");
@@ -12,12 +14,16 @@ const ThankYou = () => {
   const reference = searchParams.get("reference");
 
   useEffect(() => {
+    if (status === "APPROVED" || status === "PENDING") {
+      setCartItems([]);
+    }
     const timer = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isApproved = !status || status === "APPROVED";
   const isPending = status === "PENDING";
+  const isDeclined = status === "DECLINED" || status === "VOIDED" || status === "ERROR";
 
   return (
     <div className={`ty-wrapper ${visible ? "ty-visible" : ""}`}>
@@ -40,13 +46,15 @@ const ThankYou = () => {
         </div>
 
         <h1 className="ty-title">
-          {isPending ? "¡Pago en proceso!" : "¡Gracias por tu compra!"}
+          {isDeclined ? "Pago rechazado" : isPending ? "¡Pago en proceso!" : "¡Gracias por tu compra!"}
         </h1>
 
         <p className="ty-subtitle">
-          {isPending
-            ? "Tu pago PSE está siendo procesado. Te notificaremos por correo cuando sea confirmado."
-            : "Tu pago fue procesado exitosamente. En breve recibirás un correo de confirmación."}
+          {isDeclined
+            ? "Tu pago no pudo ser procesado. Por favor intenta de nuevo con otro método de pago."
+            : isPending
+              ? "Tu pago está siendo procesado. Te notificaremos por correo cuando sea confirmado."
+              : "Tu pago fue procesado exitosamente. En breve recibirás un correo de confirmación."}
         </p>
 
         {(transactionId || reference) && (

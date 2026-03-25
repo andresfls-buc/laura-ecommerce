@@ -160,3 +160,8 @@
     max-width: 180px;
   }
 }
+
+/* Hide WhatsApp button when checkout modal is open */
+body.checkout-open .wa-wrapper {
+  display: none;
+}

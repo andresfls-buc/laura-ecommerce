@@ -22,7 +22,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/products/${id}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/products/${id}`);
         const fetchedProduct = res.data;
         setProduct(fetchedProduct);
 

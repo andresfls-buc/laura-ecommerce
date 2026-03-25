@@ -2,5 +2,5 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:3000", // Ajusta al puerto de tu backend
+  baseURL: (process.env.REACT_APP_API_URL || "http://localhost:3000/api").replace("/api", ""),
 });
