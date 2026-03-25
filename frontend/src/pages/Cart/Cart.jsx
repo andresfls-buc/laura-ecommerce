@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { FiTrash2 } from "react-icons/fi";
 import CheckoutModal from "./CheckoutModal";
@@ -12,7 +11,6 @@ const Cart = () => {
   const { cartItems, setCartItems } = useCart();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
 
   const items = cartItems || [];
 
