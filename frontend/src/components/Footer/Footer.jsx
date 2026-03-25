@@ -1,7 +1,7 @@
 import logo from "../../assets/logo.png";
 import "./Footer.css";
 import { Link } from "react-router-dom";
-import { FaCcVisa, FaCcMastercard, FaCcAmex } from "react-icons/fa";
+import { FaCcVisa, FaCcMastercard, FaCcAmex, FaInstagram, FaTiktok } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -30,6 +30,14 @@ const Footer = () => {
         <div className="footer-section" id="footer-contacto">
           <h4>Contacto</h4>
           <p>contacto@gogouniformes.com</p>
+          <div className="footer-social">
+            <a href="https://instagram.com/gogo_uniformes" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <FaInstagram />
+            </a>
+            <a href="https://tiktok.com/@gogo_uniformes" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <FaTiktok />
+            </a>
+          </div>
         </div>
       </div>
 

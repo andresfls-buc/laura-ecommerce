@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { FiTrash2 } from "react-icons/fi";
 import CheckoutModal from "./CheckoutModal";
@@ -12,7 +11,6 @@ const Cart = () => {
   const { cartItems, setCartItems } = useCart();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
 
   const items = cartItems || [];
 
@@ -20,7 +18,7 @@ const Cart = () => {
   useEffect(() => {
     const syncCart = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/products");
+        const res = await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/products`);
         if (!res.ok) return;
 
         const products = await res.json();
@@ -68,13 +66,13 @@ const Cart = () => {
   const freeShipping = totalUnits >= FREE_SHIPPING_THRESHOLD;
   const shippingCost = freeShipping ? 0 : SHIPPING_COST;
 
-  // ✅ HANDLE CHECKOUT (ABRE EL WIDGET DIRECTAMENTE)
+  // ✅ HANDLE CHECKOUT
   const handleCheckout = async (formData) => {
     try {
       setLoading(true);
 
-      // 1. Validar stock antes de disparar la orden
-      const resProducts = await fetch("http://localhost:3000/api/products");
+      // 1. Validar stock
+      const resProducts = await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/products`);
       const products = await resProducts.json();
       const allVariants = products.flatMap(
         (p) => p.Variants || p.variants || []
@@ -93,8 +91,8 @@ const Cart = () => {
         return;
       }
 
-      // 2. Crear la orden en el Backend
-      const res = await fetch("http://localhost:3000/api/orders", {
+      // 2. Crear la orden — el backend crea el payment link con Wompi
+      const res = await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -107,45 +105,17 @@ const Cart = () => {
       });
 
       const responseBody = await res.json();
-
-      // Extraer checkout data (soporta raíz o .data)
       const checkoutData =
         responseBody.checkout ||
         (responseBody.data && responseBody.data.checkout);
 
-      if (!checkoutData) {
-        throw new Error("No se recibió la configuración de pago del servidor.");
+      if (!checkoutData?.paymentUrl) {
+        throw new Error("No se recibió el link de pago del servidor.");
       }
 
-      // 3. 🚀 DISPARAR WIDGET DE WOMPI DIRECTAMENTE
-      // redirectUrl is required for PSE (bank redirect flow).
-      // For cards: callback fires → navigate() handles redirect.
-      // For PSE: callback is skipped → Wompi redirects to redirectUrl.
-      const checkout = new window.WidgetCheckout({
-        currency: checkoutData.currency,
-        amountInCents: checkoutData.amountInCents,
-        reference: checkoutData.reference,
-        publicKey: checkoutData.publicKey,
-        signature: { integrity: checkoutData.signature },
-        redirectUrl: checkoutData.redirectUrl,
-      });
-
-      checkout.open((result) => {
-        const transaction = result?.transaction;
-
-        if (!transaction) return;
-
-        setIsModalOpen(false);
-
-        if (transaction.status === "APPROVED" || transaction.status === "PENDING") {
-          setCartItems([]);
-          navigate(
-            `/thank-you?id=${transaction.id}&status=${transaction.status}&reference=${transaction.reference}`
-          );
-        } else if (transaction.status === "DECLINED") {
-          alert("El pago fue rechazado.");
-        }
-      });
+      // 3. Redirigir al link de pago de Wompi (restricción de método aplicada server-side)
+      setIsModalOpen(false);
+      window.location.href = checkoutData.paymentUrl;
     } catch (error) {
       console.error("Checkout error:", error.message);
       alert("Error: " + error.message);
@@ -168,6 +138,8 @@ const Cart = () => {
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleCheckout}
         loading={loading}
+        subtotal={subtotal}
+        shippingCost={shippingCost}
       />
 
       <div className="cart-page">
@@ -240,10 +212,8 @@ const Cart = () => {
             </div>
             <div className="summary-divider" />
             <div className="summary-row summary-total">
-              <span>Total estimado</span>
-              <span>
-                ${(subtotal + shippingCost).toLocaleString("es-CO")} COP
-              </span>
+              <span>Total</span>
+              <span>${(subtotal + shippingCost).toLocaleString("es-CO")} COP</span>
             </div>
             <button
               className="checkout-btn"

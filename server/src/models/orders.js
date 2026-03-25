@@ -81,8 +81,8 @@ Order.init(
     },
 
     paymentMethod: {
-      type: DataTypes.ENUM("wompi", "nequi", "daviplata", "bank_transfer"),
-      allowNull: false,
+      type: DataTypes.ENUM("wompi", "nequi", "daviplata", "bank_transfer", "credit_card"),
+      allowNull: true,
     },
 
     creditCardSurcharge: {

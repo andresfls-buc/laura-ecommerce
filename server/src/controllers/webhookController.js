@@ -3,8 +3,6 @@ import sequelize from "../config/sequelize.js";
 import { Order, Order_items, ProductVariant } from "../models/index.js";
 import { sendPostPaymentEmails } from "../services/emailService.js";
 
-const SURCHARGE_RATE = 0.05;
-
 // ── WOMPI SIGNATURE VERIFICATION ────────────────────────────────────────────
 const verifyWompiWebhook = (event) => {
   try {
@@ -75,10 +73,15 @@ export const handleWompiWebhook = async (req, res) => {
       `🔄 Procesando webhook — Referencia: ${reference} | Estado: ${wompiStatus}`
     );
 
-    const order = await Order.findOne({ where: { reference } });
+    // Wompi payment links generate their own reference in the format:
+    //   {linkId}_{unixTimestamp10digits}_{random}
+    // e.g. test_hb6q9Z_1774413632_weswOHfKv
+    // We strip the timestamp+random suffix to recover the linkId we stored.
+    const linkId = reference.replace(/_\d{10}_\w+$/, "");
+    const order = await Order.findOne({ where: { wompiTransactionId: linkId } });
 
     if (!order) {
-      console.error(`No se encontro orden con referencia: ${reference}`);
+      console.error(`No se encontro orden para linkId: ${linkId} (ref: ${reference})`);
       return;
     }
 
@@ -121,34 +124,29 @@ async function handleApprovedPayment(order, transaction, reference) {
   const wompiPaymentType = transaction.payment_method_type;
   const isCardPayment = wompiPaymentType === "CARD";
 
-  const subtotal = parseFloat(order.subtotal);
-  const shippingCost = parseFloat(order.shippingCost) || 0;
-  const existingSurcharge = parseFloat(order.creditCardSurcharge) || 0;
+  // Validate that Wompi charged exactly what the order expected
+  const wompiAmount = transaction.amount_in_cents / 100;
+  const expectedAmount = parseFloat(order.totalAmount);
 
-  let creditCardSurcharge = existingSurcharge;
-  let totalAmount = parseFloat(order.totalAmount);
-
-  const baseAmount = subtotal + shippingCost;
-
-  if (isCardPayment && existingSurcharge === 0) {
-    creditCardSurcharge = Number((baseAmount * SURCHARGE_RATE).toFixed(2));
-
-    totalAmount = Number((baseAmount + creditCardSurcharge).toFixed(2));
-
-    console.log(
-      `⚠️ Recargo aplicado — Orden #${reference}: +$${creditCardSurcharge}`
-    );
-  } else if (!isCardPayment) {
-    creditCardSurcharge = 0;
-    totalAmount = Number(baseAmount.toFixed(2));
+  if (Math.abs(wompiAmount - expectedAmount) > 1) {
+    console.error(`❌ Monto inconsistente en orden #${reference}`);
+    console.error(`Esperado: ${expectedAmount} | Pagado: ${wompiAmount}`);
+    return;
   }
 
-  // ✅ NEW: Validate Wompi amount
-  const wompiAmount = transaction.amount_in_cents / 100;
-
-  if (Math.abs(wompiAmount - totalAmount) > 1) {
-    console.error(`❌ Monto inconsistente en orden #${reference}`);
-    console.error(`Esperado: ${totalAmount} | Pagado: ${wompiAmount}`);
+  // ── Surcharge bypass detection ─────────────────────────────────────────
+  // If Wompi confirms a CARD payment but the order has no surcharge recorded,
+  // the customer bypassed the frontend payment method selection.
+  // Mark payment received but keep status "pending" — order is NOT fulfilled.
+  const surchargeRecorded = parseFloat(order.creditCardSurcharge) > 0;
+  if (isCardPayment && !surchargeRecorded) {
+    console.warn(`🚨 RECARGO ELUDIDO — Orden #${reference}: pago con tarjeta sin recargo. Retenida.`);
+    await order.update({
+      paymentStatus: "paid",
+      status: "pending",
+      wompiTransactionId: transaction.id,
+      paymentMethod: "credit_card",
+    });
     return;
   }
 
@@ -179,8 +177,6 @@ async function handleApprovedPayment(order, transaction, reference) {
         paymentMethod: isCardPayment
           ? "credit_card"
           : mapPaymentMethod(wompiPaymentType),
-        creditCardSurcharge,
-        totalAmount,
       },
       { transaction: dbTransaction }
     );
@@ -192,7 +188,7 @@ async function handleApprovedPayment(order, transaction, reference) {
     return;
   }
 
-  console.log(`✅ Orden #${reference} PAGADA | Total: $${totalAmount}`);
+  console.log(`✅ Orden #${reference} PAGADA | Total: $${expectedAmount}`);
 
   const orderItems = await Order_items.findAll({
     where: { orderId: order.id },
@@ -215,6 +211,7 @@ async function handleApprovedPayment(order, transaction, reference) {
 
   await sendPostPaymentEmails(order, formattedItems);
 }
+
 
 // ── HANDLE FAILED PAYMENT ────────────────────────────────────────────────────
 async function handleFailedPayment(order, transaction, reference, wompiStatus) {

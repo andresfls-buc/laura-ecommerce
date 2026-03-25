@@ -7,7 +7,7 @@ import {
   ProductVariant,
   Product,
 } from "../models/index.js";
-import { SHIPPING_COST } from "../config/constants.js";
+import { SHIPPING_COST, SURCHARGE_RATE } from "../config/constants.js";
 
 class OrderService {
   static async createOrder(userId, orderData) {
@@ -62,10 +62,14 @@ class OrderService {
       const freeShipping = totalUnits >= 3;
       const shippingCost = freeShipping ? 0 : SHIPPING_COST;
 
-      // ── IMPORTANT CHANGE: NO SURCHARGE HERE ──────────────────
-      const creditCardSurcharge = 0;
+      // ── SURCHARGE ─────────────────────────────────────────────
+      const isCardPayment = paymentMethod === "credit_card";
+      const baseAmount = subtotal + shippingCost;
+      const creditCardSurcharge = isCardPayment
+        ? Number((baseAmount * SURCHARGE_RATE).toFixed(2))
+        : 0;
 
-      const totalAmount = subtotal + shippingCost;
+      const totalAmount = baseAmount + creditCardSurcharge;
 
       const reference = `ORDER-${Date.now()}-${Math.floor(
         Math.random() * 1000
@@ -80,11 +84,11 @@ class OrderService {
           shippingAddress,
           shippingCity,
           shippingPostalCode,
-          paymentMethod, // will be updated later by webhook
+          paymentMethod: null, // updated by webhook with actual Wompi payment type
           totalUnits,
           subtotal,
           shippingCost,
-          creditCardSurcharge: 0, // always 0 initially
+          creditCardSurcharge,
           totalAmount,
           reference,
           status: "pending",
@@ -114,7 +118,7 @@ class OrderService {
         order,
         checkout: {
           reference,
-          amountInCents: Math.round(totalAmount * 100), // 👈 base only
+          amountInCents: Math.round(totalAmount * 100),
           currency: "COP",
         },
       };

@@ -8,7 +8,7 @@ export function useProducts() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await api.get("http://localhost:3000/api/products");
+        const res = await api.get(`${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/products`);
 
         // map each product to add flat images array
         const productsWithImages = res.data.map(product => {

@@ -4,7 +4,7 @@ function FeaturedProducts() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/products")
+    fetch(`${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/products`)
       .then(res => res.json())
       .then(data => setProducts(data.slice(0, 4)));
   }, []);

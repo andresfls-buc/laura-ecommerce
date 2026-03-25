@@ -1,62 +1,68 @@
-import crypto from "crypto";
 import OrderService from "../services/order.service.js";
 
-/**
- * Handles the creation of a new order and prepares
- * the necessary data for the Wompi payment widget.
- */
+const WOMPI_METHOD_MAP = {
+  credit_card: ["CARD"],
+  nequi:       ["NEQUI"],
+  daviplata:   ["DAVIPLATA"],
+  pse:         ["PSE"],
+};
+
 export const createOrder = async (req, res, next) => {
   try {
     const { userId = null, ...orderData } = req.body;
 
-    // 1. Call Service - result contains { order, checkout }
-    const result = await OrderService.createOrder(userId, orderData);
+    // 1. Create order in DB
+    const { order, checkout } = await OrderService.createOrder(userId, orderData);
 
-    // 2. Destructure the order and the checkout data
-    const { order, checkout } = result;
+    // 2. Create Wompi payment link (server-side — enforces accepted_payment_methods)
+    const wompiBase = process.env.WOMPI_ENV === "sandbox"
+      ? "https://sandbox.wompi.co/v1"
+      : "https://production.wompi.co/v1";
 
-    // 3. Prepare variables for Signature
-    // Ensure all values are treated as strings to avoid hash mismatches
-    const reference = String(checkout.reference);
-    const amountInCents = String(checkout.amountInCents);
-    const currency = String(checkout.currency || "COP");
-    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET;
-    const publicKey = process.env.WOMPI_PUBLIC_KEY;
-    const redirectUrl = process.env.WOMPI_REDIRECT_URL;
+    const acceptedMethods = WOMPI_METHOD_MAP[orderData.paymentMethod] ?? ["CARD", "NEQUI", "PSE", "DAVIPLATA"];
 
-    // 4. Generate the SHA256 Integrity Signature
-    // Strict Order: reference + amountInCents + currency + redirectUrl + integritySecret
-    // ✅ Correct — no redirectUrl in the signature
-    const rawSignatureString = `${reference}${amountInCents}${currency}${integritySecret}`;
+    const linkRes = await fetch(`${wompiBase}/payment_links`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.WOMPI_PRIVATE_KEY}`,
+      },
+      body: JSON.stringify({
+        name: `Orden ${checkout.reference}`,
+        description: `Compra en ${process.env.STORE_NAME || "tienda"}`,
+        single_use: true,
+        collect_shipping: false,
+        amount_in_cents: checkout.amountInCents,
+        currency: checkout.currency,
+        redirect_url: process.env.WOMPI_REDIRECT_URL,
+        accepted_payment_methods: acceptedMethods,
+      }),
+    });
 
-    const signature = crypto
-      .createHash("sha256")
-      .update(rawSignatureString)
-      .digest("hex");
+    const linkData = await linkRes.json();
+    const linkId = linkData?.data?.id;
+    const paymentUrl = linkId ? `https://checkout.wompi.co/l/${linkId}` : null;
 
-    console.log("--- Signature Debug ---");
-    console.log("1. reference:    ", JSON.stringify(reference));
-    console.log("2. amountInCents:", JSON.stringify(amountInCents));
-    console.log("3. currency:     ", JSON.stringify(currency));
-    console.log("4. redirectUrl:  ", JSON.stringify(redirectUrl));
-    console.log("5. secret:       ", JSON.stringify(integritySecret));
-    console.log("6. Raw String:   ", JSON.stringify(rawSignatureString));
-    console.log("7. Signature:    ", signature);
-    console.log("8. Sig length:   ", signature.length);
+    if (!paymentUrl) {
+      console.error("Wompi payment link error:", JSON.stringify(linkData));
+      throw new Error("No se pudo crear el link de pago con Wompi");
+    }
 
-    // 5. Return everything to Frontend
+    console.log(`✅ Payment link creado — ${checkout.reference} | Método: ${orderData.paymentMethod} | URL: ${paymentUrl}`);
+
+    // 3. Save linkId on the order so the webhook can correlate it
+    //    Wompi generates its own reference (e.g. test_abc123_timestamp_random),
+    //    not our order reference — we store the linkId to look it up later.
+    await order.update({ wompiTransactionId: linkId });
+
+    // 4. Return order + payment URL to frontend
     return res.status(201).json({
       status: "success",
       data: {
-        // Spread the database order object
         ...(order.toJSON ? order.toJSON() : order),
         checkout: {
-          reference: reference,
-          amountInCents: Number(amountInCents),
-          currency: currency,
-          signature: signature,
-          publicKey: publicKey,
-          redirectUrl: redirectUrl, // ← sent to frontend for widget
+          paymentUrl,
+          reference: checkout.reference,
         },
       },
     });

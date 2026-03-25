@@ -31,7 +31,8 @@ const Contact = () => {
     setSubmitError("");
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+      const BASE_URL =
+        process.env.REACT_APP_API_URL || "http://localhost:3000/api";
       const res = await fetch(`${BASE_URL}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,12 +76,12 @@ const Contact = () => {
     {
       question: "¿Cuál es su política de devoluciones?",
       answer:
-        "Ofrecemos una política de devolución de 30 días en la mayoría de los artículos. Los productos deben estar sin usar y en su empaque original. Simplemente inicia una devolución contactando a nuestro equipo de soporte para asistencia, mediante un email o whatsapp.",
+        "Ofrecemos una política de devolución de 15 días en la mayoría de los artículos. Los productos deben estar sin usar y en su empaque original. Simplemente inicia una devolución contactando a nuestro equipo de soporte para asistencia, mediante un email o whatsapp.",
     },
     {
       question: "¿Cuánto tarda el envío?",
       answer:
-        "El envío estándar tarda de 5-7 días hábiles, varían según el destino (máximo 10 días hábiles).",
+        "El envío estándar tarda de 3-5 días hábiles, varían según el destino (máximo 8 días hábiles).",
     },
     {
       question: "¿Envían internacionalmente?",
@@ -147,7 +148,17 @@ const Contact = () => {
             )}
 
             {submitError && (
-              <div className="error-message" style={{ color: "#c0392b", background: "#fdecea", border: "1px solid #f5c6cb", borderRadius: "6px", padding: "12px 16px", marginBottom: "16px" }}>
+              <div
+                className="error-message"
+                style={{
+                  color: "#c0392b",
+                  background: "#fdecea",
+                  border: "1px solid #f5c6cb",
+                  borderRadius: "6px",
+                  padding: "12px 16px",
+                  marginBottom: "16px",
+                }}
+              >
                 ✗ {submitError}
               </div>
             )}
@@ -268,7 +279,11 @@ const Contact = () => {
                 ></textarea>
               </div>
 
-              <button type="submit" className="submit-button" disabled={isSubmitting}>
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={isSubmitting}
+              >
                 <span>{isSubmitting ? "Enviando..." : "Enviar Mensaje"}</span>
               </button>
             </form>

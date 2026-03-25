@@ -1,5 +1,6 @@
 // src/Home.jsx
 import { Link } from "react-router-dom";
+import { FiTruck } from "react-icons/fi";
 import ProductCard from "../../components/ProductCard";
 import { useProducts } from "../../hooks/useProducts";
 import "./Home.css";
@@ -25,6 +26,12 @@ const Home = () => {
 
   return (
     <div className="home-container">
+      {/* Promo bar — envío gratis */}
+      <div className="promo-bar">
+        <FiTruck size={15} style={{ marginRight: "0.4rem", verticalAlign: "middle" }} />
+        <span>¡Envío gratis comprando 3 o más productos!</span>
+      </div>
+
       {/* Banner principal con imagen de fondo */}
       <section className="banner-section">
         <div

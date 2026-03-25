@@ -32,7 +32,7 @@ export default function AdminLogin() {
       <div className="login-card">
         <div className="login-header">
           <div className="login-logo">⚡</div>
-          <h1>Admin Panel</h1>
+          <h1>Gogo Admin</h1>
           <p>Sign in to manage your store</p>
         </div>
 
