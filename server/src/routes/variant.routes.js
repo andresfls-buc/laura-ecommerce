@@ -2,7 +2,7 @@ import express from "express";
 import VariantController from "../controllers/variant.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { adjustStockSchema } from "../schemas/variant.schema.js";
-import upload from "../middlewares/upload.middleware.js";
+import upload, { cloudinary } from "../middlewares/upload.middleware.js";
 import ProductImage from "../models/productImage.model.js";
 import { protectAdmin } from "../middlewares/auth.middleware.js";
 
@@ -24,7 +24,6 @@ router.post(
   upload.single("image"),
   async (req, res) => {
     try {
-      // 🔐 Role check
       if (!req.user || req.user.role !== "admin") {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -40,15 +39,14 @@ router.post(
       });
 
       if (existingImages >= 3) {
+        await cloudinary.uploader.destroy(req.file.filename);
         return res
           .status(400)
           .json({ message: "Maximum 3 images per variant allowed" });
       }
 
-      const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
-
       const newImage = await ProductImage.create({
-        imageUrl,
+        imageUrl: req.file.path,
         publicId: req.file.filename,
         order: existingImages + 1,
         productVariantId: variantId,
@@ -68,7 +66,6 @@ router.delete(
   protectAdmin,
   async (req, res) => {
     try {
-      // 🔐 Role check
       if (!req.user || req.user.role !== "admin") {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -81,6 +78,7 @@ router.delete(
         return res.status(404).json({ message: "Image not found" });
       }
 
+      await cloudinary.uploader.destroy(image.publicId);
       await image.destroy();
 
       res.status(200).json({ message: "Image deleted successfully" });
