@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
 cloudinary.config({
@@ -8,15 +7,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "gogo-uniformes",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
-  },
-});
-
-const upload = multer({ storage });
+// Store file in memory so we can stream it to Cloudinary
+const upload = multer({ storage: multer.memoryStorage() });
 
 export { cloudinary };
 export default upload;

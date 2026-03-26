@@ -6,8 +6,19 @@ import upload, { cloudinary } from "../middlewares/upload.middleware.js";
 import ProductImage from "../models/productImage.model.js";
 import { protectAdmin } from "../middlewares/auth.middleware.js";
 
-
 const router = express.Router();
+
+const uploadToCloudinary = (buffer) =>
+  new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "gogo-uniformes" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    stream.end(buffer);
+  });
 
 // Adjust stock (Admin only)
 router.patch(
@@ -39,15 +50,16 @@ router.post(
       });
 
       if (existingImages >= 3) {
-        await cloudinary.uploader.destroy(req.file.filename);
         return res
           .status(400)
           .json({ message: "Maximum 3 images per variant allowed" });
       }
 
+      const result = await uploadToCloudinary(req.file.buffer);
+
       const newImage = await ProductImage.create({
-        imageUrl: req.file.path,
-        publicId: req.file.filename,
+        imageUrl: result.secure_url,
+        publicId: result.public_id,
         order: existingImages + 1,
         productVariantId: variantId,
       });
