@@ -335,6 +335,91 @@
 }
 
 /* ========================================
+   SIZE GUIDE
+   ======================================== */
+.size-guide {
+  margin-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.size-guide-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #1a1a1a;
+}
+
+.size-guide-toggle:hover {
+  color: #555;
+}
+
+.size-guide-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.size-guide-arrow.open {
+  transform: rotate(180deg);
+}
+
+.size-guide-tables {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.size-table-wrapper {
+  overflow-x: auto;
+}
+
+.size-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.82rem;
+}
+
+.size-table th,
+.size-table td {
+  border: 1px solid #e0e0e0;
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.size-table th {
+  background: #f4f4f4;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.size-table tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+.size-row-label {
+  font-weight: 500;
+  text-align: left !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  background: #f4f4f4 !important;
+}
+
+/* ========================================
    LOADING & ERROR STATES
    ======================================== */
 .loading-text,

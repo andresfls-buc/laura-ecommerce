@@ -7,6 +7,12 @@ import { BsCartPlus } from "react-icons/bs";
 import { MdPayment } from "react-icons/md";
 import { FiCheckCircle, FiAlertTriangle, FiXCircle } from "react-icons/fi";
 
+const SIZE_GUIDE = [
+  { label: "BUSTO",   sizes4to16: [84,88,92,96,100,104,108], sizes18to34: [112,116,120,124,128,132,136,140,144] },
+  { label: "CINTURA", sizes4to16: [64,68,72,76,80,84,88],    sizes18to34: [92,96,100,104,108,112,116,120,124] },
+  { label: "CADERA",  sizes4to16: [88,92,96,100,104,108,112], sizes18to34: [116,120,124,128,132,136,140,144,148] },
+];
+
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -16,8 +22,9 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [toast, setToast] = useState(null); // Toast notification state
-  const [addingToCart, setAddingToCart] = useState(false); // Button loading state
+  const [toast, setToast] = useState(null);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -198,6 +205,59 @@ const ProductDetail = () => {
             >
               <MdPayment size={20} /> Ir a pagar
             </button>
+          </div>
+
+          {/* Size guide */}
+          <div className="size-guide">
+            <button
+              className="size-guide-toggle"
+              onClick={() => setShowSizeGuide((prev) => !prev)}
+            >
+              <span>Guía de tallas (cm)</span>
+              <span className={`size-guide-arrow ${showSizeGuide ? "open" : ""}`}>&#8964;</span>
+            </button>
+
+            {showSizeGuide && (
+              <div className="size-guide-tables">
+                <div className="size-table-wrapper">
+                  <table className="size-table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        {[4,6,8,10,12,14,16].map((s) => <th key={s}>{s}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {SIZE_GUIDE.map((row) => (
+                        <tr key={row.label}>
+                          <td className="size-row-label">{row.label}</td>
+                          {row.sizes4to16.map((val, i) => <td key={i}>{val}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="size-table-wrapper">
+                  <table className="size-table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        {[18,20,22,24,26,28,30,32,34].map((s) => <th key={s}>{s}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {SIZE_GUIDE.map((row) => (
+                        <tr key={row.label}>
+                          <td className="size-row-label">{row.label}</td>
+                          {row.sizes18to34.map((val, i) => <td key={i}>{val}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
