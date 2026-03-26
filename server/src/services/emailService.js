@@ -45,7 +45,7 @@ export const sendAdminNotificationEmail = async (order, orderItems) => {
   try {
     const mailOptions = {
       from: `"${process.env.STORE_NAME}" <${process.env.GMAIL_USER}>`,
-      to: process.env.ADMIN_EMAIL,
+      to: "gogouniformes@gmail.com",
       subject: `🛒 Nueva venta — Pedido #${order.reference} | ${order.customerName}`,
       html: adminNotificationTemplate(order, orderItems, process.env.STORE_NAME),
     };
