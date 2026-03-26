@@ -41,9 +41,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// Server uploaded images
-app.use("/uploads", express.static(path.resolve("uploads")));
-
 // Routes
 app.use("/api", routes);
 
