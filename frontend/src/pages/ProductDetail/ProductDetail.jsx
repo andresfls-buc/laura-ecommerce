@@ -164,16 +164,32 @@ const ProductDetail = () => {
           {product.variants?.length > 0 && (
             <div className="variant-section">
               <h4>Seleccione variante:</h4>
-              <div className="variant-buttons">
-                {product.variants.map((variant) => (
-                  <button
-                    key={variant.id}
-                    onClick={() => handleVariantChange(variant)}
-                    className={`variant-btn ${selectedVariant?.id === variant.id ? "selected" : ""}`}
-                  >
-                    {variant.color} - {variant.size}
-                  </button>
-                ))}
+              {selectedVariant && (
+                <p className="selected-variant-label">
+                  {selectedVariant.color} — {selectedVariant.size}
+                </p>
+              )}
+              <div className="variant-swatches">
+                {product.variants.map((variant) => {
+                  const swatchImg = variant.images?.[0]?.imageUrl;
+                  const isSelected = selectedVariant?.id === variant.id;
+                  const isOOS = variant.stock === 0;
+                  return (
+                    <button
+                      key={variant.id}
+                      onClick={() => handleVariantChange(variant)}
+                      className={`swatch-btn ${isSelected ? "swatch-selected" : ""} ${isOOS ? "swatch-oos" : ""}`}
+                      title={`${variant.color} — ${variant.size}`}
+                    >
+                      {swatchImg ? (
+                        <img src={swatchImg} alt={variant.color} className="swatch-img" />
+                      ) : (
+                        <span className="swatch-fallback">{variant.color?.charAt(0)}</span>
+                      )}
+                      {isOOS && <span className="swatch-oos-line" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
