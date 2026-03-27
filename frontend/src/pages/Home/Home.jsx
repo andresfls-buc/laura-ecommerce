@@ -24,7 +24,7 @@ const shuffleArray = (arr) => {
   return a;
 };
 
-const SLIDE_INTERVAL = 4000;
+const SLIDE_INTERVAL = 6000; // 6 seconds
 
 const Home = () => {
   const { products, loading } = useProducts();
@@ -69,7 +69,10 @@ const Home = () => {
     <div className="home-container">
       {/* Promo bar — envío gratis */}
       <div className="promo-bar">
-        <FiTruck size={15} style={{ marginRight: "0.4rem", verticalAlign: "middle" }} />
+        <FiTruck
+          size={15}
+          style={{ marginRight: "0.4rem", verticalAlign: "middle" }}
+        />
         <span>¡Envío gratis comprando 3 o más productos!</span>
       </div>
 
@@ -84,7 +87,9 @@ const Home = () => {
         <div className="banner-content">
           <h1 className="banner-title">Descubre la nueva colección</h1>
           <p className="banner-subtitle">Viste con estilo cada día</p>
-          <Link to="/catalogue" className="banner-btn">Ver productos</Link>
+          <Link to="/catalogue" className="banner-btn">
+            Ver productos
+          </Link>
         </div>
       </section>
 
@@ -116,7 +121,7 @@ const Home = () => {
                   style={{
                     backgroundImage: `url(${getProductImage(product)})`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    backgroundPosition: "top center",
                   }}
                 />
               </div>
