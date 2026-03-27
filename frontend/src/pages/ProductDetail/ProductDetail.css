@@ -24,7 +24,7 @@
   width: 100%;
   max-width: 600px;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 0;
   border: 1px solid #e0e0e0;
   background: #f4f4f4;
@@ -39,7 +39,7 @@
 .thumbnail {
   width: 80px;
   height: 80px;
-  object-fit: cover;
+  object-fit: contain;
   cursor: pointer;
   border-radius: 0;
   border: 1px solid #e0e0e0;
