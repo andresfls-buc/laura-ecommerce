@@ -33,8 +33,13 @@ const Home = () => {
   const [fade, setFade] = useState(true);
   const intervalRef = useRef(null);
 
-  // Pick the first 3 products for the collections section
-  const collectionProducts = products.slice(0, 3);
+  // Pick up to 3 products with unique images for the collections section
+  const collectionProducts = products
+    .filter((p, i, arr) => {
+      const img = getProductImage(p);
+      return img !== "/default-product.png" && arr.findIndex((x) => getProductImage(x) === img) === i;
+    })
+    .slice(0, 3);
 
   // Build shuffled image list once products load
   useEffect(() => {
@@ -122,6 +127,7 @@ const Home = () => {
                     backgroundImage: `url(${getProductImage(product)})`,
                     backgroundSize: "contain",
                     backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
                     backgroundColor: "#f4f4f4",
                   }}
                 />
