@@ -37,6 +37,12 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.banner-fade-out {
+  opacity: 0;
 }
 
 /* Dark overlay for better text readability */

@@ -1,5 +1,6 @@
 // src/Home.jsx
 import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import { FiTruck } from "react-icons/fi";
 import ProductCard from "../../components/ProductCard";
 import { useProducts } from "../../hooks/useProducts";
@@ -13,16 +14,56 @@ const getProductImage = (product) => {
   return fromVariants || product.image || "/default-product.png";
 };
 
+// Fisher-Yates shuffle
+const shuffleArray = (arr) => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+const SLIDE_INTERVAL = 4000;
+
 const Home = () => {
   const { products, loading } = useProducts();
+  const [sliderImages, setSliderImages] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [fade, setFade] = useState(true);
+  const intervalRef = useRef(null);
 
   // Pick the first 3 products for the collections section
   const collectionProducts = products.slice(0, 3);
 
-  // Get a featured product image for the banner background
-  // You can change this to use a specific product or a static image
+  // Build shuffled image list once products load
+  useEffect(() => {
+    if (products.length === 0) return;
+    const allImages = products.flatMap((p) => {
+      const img = getProductImage(p);
+      return img !== "/default-product.png" ? [img] : [];
+    });
+    setSliderImages(shuffleArray(allImages));
+    setCurrentIndex(0);
+  }, [products]);
+
+  // Auto-advance slider
+  useEffect(() => {
+    if (sliderImages.length < 2) return;
+    intervalRef.current = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % sliderImages.length);
+        setFade(true);
+      }, 500);
+    }, SLIDE_INTERVAL);
+    return () => clearInterval(intervalRef.current);
+  }, [sliderImages]);
+
   const bannerImage =
-    products.length > 0 ? getProductImage(products[0]) : "/banner-default.jpg"; // Fallback image
+    sliderImages.length > 0
+      ? sliderImages[currentIndex]
+      : "/banner-default.jpg";
 
   return (
     <div className="home-container">
@@ -35,7 +76,7 @@ const Home = () => {
       {/* Banner principal con imagen de fondo */}
       <section className="banner-section">
         <div
-          className="banner-background"
+          className={`banner-background${fade ? "" : " banner-fade-out"}`}
           style={{
             backgroundImage: `url(${bannerImage})`,
           }}

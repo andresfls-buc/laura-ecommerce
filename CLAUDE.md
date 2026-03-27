@@ -58,7 +58,7 @@ Request flow: `routes → middleware (validate/auth) → controller → service 
 - **Services** — business logic layer (email sending, payment processing, order orchestration)
 - **Models** — Sequelize ORM; associations defined in `models/index.js`
 - **Schemas** — Joi validation schemas used by `validate.middleware.js` before controllers run
-- **Middlewares** — `auth.middleware.js` (JWT + admin role), `upload.middleware.js` (Multer), `globalErrorHandler.js` (Boom-based)
+- **Middlewares** — `auth.middleware.js` (JWT + admin role), `upload.middleware.js` (Multer + Cloudinary config), `globalErrorHandler.js` (Boom-based)
 
 ### Key Domain Models
 
@@ -67,11 +67,11 @@ Request flow: `routes → middleware (validate/auth) → controller → service 
 
 ### Payment Flow
 
-Wompi (Colombian payment gateway) in sandbox/test mode. The backend exposes `/api/payments` for webhook event handling. Payment status is tracked via enums on the `Order` model (see migrations for the enum values).
+Wompi (Colombian payment gateway) — production keys are in use. The backend exposes `POST /api/payments/webhook` for Wompi event notifications. Payment status is tracked via enums on the `Order` model (see migrations for the enum values).
 
 ### File Uploads
 
-Multer stores uploaded files in `server/uploads/`, served as static assets by Express.
+Images are uploaded to **Cloudinary** (cloud storage — not local filesystem). Multer holds the file in memory, then streams the buffer to Cloudinary via `upload_stream`. Images are stored in the `gogo-uniformes` folder on Cloudinary. The `ProductImage` model stores both `imageUrl` (Cloudinary `secure_url`) and `publicId` (used for deletion). Upload/delete logic lives in `server/src/routes/variant.routes.js`. Max 3 images per variant.
 
 ### Email Notifications
 
@@ -88,10 +88,11 @@ REACT_APP_API_URL=http://localhost:3000/api
 ```
 PORT, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 JWT_SECRET
-WOMPI_PUBLIC_KEY, WOMPI_PRIVATE_KEY, WOMPI_INTEGRITY_KEY, WOMPI_EVENTS_SECRET
+WOMPI_PUBLIC_KEY, WOMPI_PRIVATE_KEY, WOMPI_INTEGRITY_SECRET, WOMPI_EVENTS_SECRET, WOMPI_ENV
 WOMPI_REDIRECT_URL, FRONTEND_URL
 GMAIL_USER, GMAIL_APP_PASSWORD
 STORE_NAME, ADMIN_EMAIL
+CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
 ```
 
 ## Code Style
