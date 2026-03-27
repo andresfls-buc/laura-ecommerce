@@ -22,21 +22,21 @@
   border-color: #1a1a1a;
 }
 
-/* ── IMAGE - FIXED SQUARE RATIO ──────────────────────────────── */
+/* ── IMAGE - PORTRAIT RATIO FOR CLOTHING ─────────────────────── */
 .image-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1; /* Modern way to create square - better than padding-top */
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   background-color: #f4f4f4;
-  flex-shrink: 0; /* Prevents image from shrinking */
+  flex-shrink: 0;
 }
 
 .product-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: top center;
   transition: transform 0.3s ease;
   display: block;
 }
