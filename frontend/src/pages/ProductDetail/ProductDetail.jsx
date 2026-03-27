@@ -179,14 +179,16 @@ const ProductDetail = () => {
                       key={variant.id}
                       onClick={() => handleVariantChange(variant)}
                       className={`swatch-btn ${isSelected ? "swatch-selected" : ""} ${isOOS ? "swatch-oos" : ""}`}
-                      title={`${variant.color} — ${variant.size}`}
+                      data-tooltip={`${variant.color} — ${variant.size}`}
                     >
-                      {swatchImg ? (
-                        <img src={swatchImg} alt={variant.color} className="swatch-img" />
-                      ) : (
-                        <span className="swatch-fallback">{variant.color?.charAt(0)}</span>
-                      )}
-                      {isOOS && <span className="swatch-oos-line" />}
+                      <div className="swatch-img-wrap">
+                        {swatchImg ? (
+                          <img src={swatchImg} alt={variant.color} className="swatch-img" />
+                        ) : (
+                          <span className="swatch-fallback">{variant.color?.charAt(0)}</span>
+                        )}
+                        {isOOS && <span className="swatch-oos-line" />}
+                      </div>
                     </button>
                   );
                 })}
