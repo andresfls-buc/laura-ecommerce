@@ -163,10 +163,10 @@ const ProductDetail = () => {
 
           {product.variants?.length > 0 && (
             <div className="variant-section">
-              <h4>Seleccione variante:</h4>
+              <h4>Seleccione producto:</h4>
               {selectedVariant && (
                 <p className="selected-variant-label">
-                  {selectedVariant.color} — {selectedVariant.size}
+                  Color: {selectedVariant.color} — Talla: {selectedVariant.size}
                 </p>
               )}
               <div className="variant-swatches">
