@@ -76,11 +76,11 @@
 
 .description {
   font-family: "Helvetica Neue", Arial, sans-serif;
-  color: #4a4a4a;
+  color: #2a2a2a;
   margin-bottom: 2rem;
   line-height: 1.7;
   font-size: 0.95rem;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .price {
@@ -113,49 +113,84 @@
 .selected-variant-label {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 0.85rem;
-  font-weight: 400;
-  color: #4a4a4a;
+  font-weight: 500;
+  color: #1a1a1a;
   margin-bottom: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   min-height: 1.2em;
 }
 
-/* ── SWATCH GRID ─────────────────────────────────────────────── */
+/* ── SWATCH DOTS ─────────────────────────────────────────────── */
 .variant-swatches {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
+/* The button is transparent — just a positioned anchor for the tooltip */
 .swatch-btn {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
   padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  /* overflow must be visible so the tooltip escapes the button */
+  overflow: visible;
+}
+
+/* The actual circle */
+.swatch-img-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
   border: 2px solid #e0e0e0;
   background: #f4f4f4;
-  cursor: pointer;
-  border-radius: 4px;
-  overflow: hidden;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.swatch-btn:hover {
+.swatch-btn:hover .swatch-img-wrap {
   border-color: #1a1a1a;
-  transform: scale(1.05);
+  transform: scale(1.12);
 }
 
-.swatch-selected {
-  border-color: #1a1a1a;
-  border-width: 3px;
-  box-shadow: 0 0 0 1px #1a1a1a;
+.swatch-selected .swatch-img-wrap {
+  border: 3px solid #1a1a1a;
+  box-shadow: 0 0 0 2px #1a1a1a;
+}
+
+/* Tooltip — appears above the dot on hover */
+.swatch-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: #ffffff;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 200;
+}
+
+.swatch-btn:hover::after {
+  opacity: 1;
 }
 
 .swatch-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   display: block;
 }
 
@@ -165,15 +200,15 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #1a1a1a;
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Out of stock — diagonal line over swatch */
+/* Out of stock — faded + diagonal line */
 .swatch-oos {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
 .swatch-oos-line {
@@ -189,21 +224,9 @@
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .variant-swatches {
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 900px) {
-  .variant-swatches {
-    grid-template-columns: repeat(7, 1fr);
-  }
-}
-
-@media (min-width: 901px) {
-  .variant-swatches {
-    grid-template-columns: repeat(6, 1fr);
+  .swatch-img-wrap {
+    width: 38px;
+    height: 38px;
   }
 }
 
