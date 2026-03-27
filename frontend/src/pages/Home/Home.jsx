@@ -120,8 +120,9 @@ const Home = () => {
                   className="collection-img"
                   style={{
                     backgroundImage: `url(${getProductImage(product)})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "top center",
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundColor: "#f4f4f4",
                   }}
                 />
               </div>
