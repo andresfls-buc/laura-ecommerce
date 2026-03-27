@@ -105,7 +105,7 @@ const Home = () => {
           <p>Cargando productos...</p>
         ) : (
           <div className="products-grid">
-            {products.map((p) => (
+            {products.slice(0, 4).map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
