@@ -102,7 +102,7 @@
 
 .variant-section h4 {
   font-family: "Helvetica Neue", Arial, sans-serif;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   font-size: 0.9rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -110,36 +110,101 @@
   color: #1a1a1a;
 }
 
-.variant-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.variant-btn {
-  padding: 0.75rem 1.5rem;
-  border: 1px solid #e0e0e0;
-  background: #ffffff;
-  cursor: pointer;
-  border-radius: 0;
+.selected-variant-label {
   font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.85rem;
   font-weight: 400;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  color: #1a1a1a;
+  color: #4a4a4a;
+  margin-bottom: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  min-height: 1.2em;
 }
 
-.variant-btn:hover {
-  border-color: #1a1a1a;
+/* ── SWATCH GRID ─────────────────────────────────────────────── */
+.variant-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.swatch-btn {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 2px solid #e0e0e0;
   background: #f4f4f4;
+  cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.variant-btn.selected {
-  background: #1a1a1a;
-  color: #ffffff;
-  border: 1px solid #1a1a1a;
+.swatch-btn:hover {
+  border-color: #1a1a1a;
+  transform: scale(1.05);
+}
+
+.swatch-selected {
+  border-color: #1a1a1a;
+  border-width: 3px;
+  box-shadow: 0 0 0 1px #1a1a1a;
+}
+
+.swatch-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.swatch-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Out of stock — diagonal line over swatch */
+.swatch-oos {
+  opacity: 0.45;
+}
+
+.swatch-oos-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 141%;
+  height: 2px;
+  background: #e74c3c;
+  transform: translateX(-15%) translateY(-50%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .variant-swatches {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 900px) {
+  .variant-swatches {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+@media (min-width: 901px) {
+  .variant-swatches {
+    grid-template-columns: repeat(6, 1fr);
+  }
 }
 
 /* ========================================
