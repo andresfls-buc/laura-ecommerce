@@ -217,9 +217,11 @@ export default function Products() {
               (sv) => sv.id === localVariant.id
             );
           } else {
-            // create mode — match by position in the variants array
-            const idx = variants.indexOf(localVariant);
-            savedVariant = savedVariants[idx];
+            // create mode — match by color+size (position is unreliable because API sorts by size)
+            savedVariant = savedVariants.find(
+              (sv) =>
+                sv.color === localVariant.color && sv.size === localVariant.size
+            );
           }
 
           if (!savedVariant) continue;
